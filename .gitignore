@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# Cache
+.cache/
+*.cache
+
+
+#text
+DATABASE_SCHEMA.md
+DEPLOYMENT_FREE.md
+instructions.md
+LOCAL_TESTING.md
+overview.md
+PERFORMANCE.md
+runtime.text
+deplo_free.sh
+Procfile

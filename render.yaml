@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: fti-app
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt && python backend/optimize_db.py
+    startCommand: gunicorn --chdir backend --bind 0.0.0.0:$PORT app:app --workers 2
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+    healthCheckPath: /

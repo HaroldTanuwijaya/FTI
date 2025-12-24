@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-900">Financial Dashboard</h2>
+    <p class="text-gray-600">Your financial health at a glance</p>
+</div>
+
+<!-- Monthly Summary Section -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Monthly Summary</h3>
+        <button id="generate-report-btn" class="text-fti-blue hover:text-fti-blue-dark text-sm">Generate Report</button>
+    </div>
+    
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs sm:text-sm text-gray-600">Transactions</div>
+            <div id="total-transactions" class="text-base sm:text-lg font-semibold text-gray-900">0</div>
+        </div>
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs sm:text-sm text-gray-600">Avg Daily Spend</div>
+            <div id="avg-daily-spend" class="text-base sm:text-lg font-semibold text-gray-900">$0</div>
+        </div>
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs sm:text-sm text-gray-600">Top Category</div>
+            <div id="top-category" class="text-base sm:text-lg font-semibold text-gray-900">-</div>
+        </div>
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs sm:text-sm text-gray-600">Recurring Items</div>
+            <div id="recurring-count" class="text-base sm:text-lg font-semibold text-fti-blue">0</div>
+        </div>
+    </div>
+</div>
+
+<!-- FTI Score Section -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">FTI Score</h3>
+        <span class="text-sm text-gray-500">Last updated: Today</span>
+    </div>
+    
+    <!-- Score Display -->
+    <div class="flex items-center justify-center mb-6">
+        <div class="relative w-32 h-32">
+            <svg class="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                <!-- Background circle -->
+                <circle cx="60" cy="60" r="50" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                <!-- Progress circle -->
+                <circle id="score-circle" cx="60" cy="60" r="50" stroke="#0ea5e9" stroke-width="8" 
+                        fill="none" stroke-linecap="round" 
+                        stroke-dasharray="314" stroke-dashoffset="157"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center">
+                    <div id="fti-score" class="text-3xl font-bold text-fti-blue">75</div>
+                    <div class="text-xs text-gray-500">Healthy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Score Breakdown -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs sm:text-sm text-gray-600">Cash Flow</div>
+            <div class="text-base sm:text-lg font-semibold text-green-600">Good</div>
+        </div>
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs sm:text-sm text-gray-600">Spending</div>
+            <div class="text-base sm:text-lg font-semibold text-yellow-600">Fair</div>
+        </div>
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+            <div class="text-xs sm:text-sm text-gray-600">Savings</div>
+            <div class="text-base sm:text-lg font-semibold text-fti-blue">Excellent</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+            <div class="flex-1">
+                <p class="text-sm text-gray-600">Monthly Income</p>
+                <p id="monthly-income" class="text-2xl font-bold text-green-600">$0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+            <div class="flex-1">
+                <p class="text-sm text-gray-600">Monthly Expenses</p>
+                <p id="monthly-expenses" class="text-2xl font-bold text-red-600">$0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+            <div class="flex-1">
+                <p class="text-sm text-gray-600">Net Flow</p>
+                <p id="net-flow" class="text-2xl font-bold text-fti-blue">$0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+            <div class="flex-1">
+                <p class="text-sm text-gray-600">Budget Used</p>
+                <p id="budget-used" class="text-2xl font-bold text-gray-900">0%</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions & Quick Actions -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <!-- Recent Transactions -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Transactions</h3>
+            <button class="text-fti-blue hover:text-fti-blue-dark text-sm">View All</button>
+        </div>
+        <div id="recent-transactions" class="space-y-3">
+            <div class="text-center text-gray-500 py-8">
+                <p>No transactions yet</p>
+                <button class="mt-2 bg-fti-blue text-white px-4 py-2 rounded-lg hover:bg-fti-blue-dark">
+                    Add Transaction
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+            <button id="add-income-btn" class="w-full bg-fti-blue text-white p-3 rounded-lg hover:bg-fti-blue-dark flex items-center justify-center">
+                <span>Add Income</span>
+            </button>
+            <button id="add-expense-btn" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 flex items-center justify-center">
+                <span>Add Expense</span>
+            </button>
+            <button id="set-budget-btn" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 flex items-center justify-center">
+                <span>Set Budget</span>
+            </button>
+            <button id="export-data-btn" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 flex items-center justify-center">
+                <span>Export Data</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Modal -->
+<div id="transaction-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 id="modal-title" class="text-lg font-semibold text-gray-900">Add Transaction</h3>
+                    <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="transaction-form">
+                    <input type="hidden" id="transaction-type" value="expense">
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                        <input type="number" id="amount" step="0.01" min="0" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-fti-blue focus:border-fti-blue">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <input type="text" id="description" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-fti-blue focus:border-fti-blue">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                        <select id="category" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-fti-blue focus:border-fti-blue">
+                            <option value="">Select Category</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">💡 Leave as "Other" for auto-categorization</p>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="button" id="cancel-btn" 
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="flex-1 px-4 py-2 bg-fti-blue text-white rounded-lg hover:bg-fti-blue-dark">
+                            Add Transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Budget Modal -->
+<div id="budget-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Set Monthly Budget</h3>
+                    <button id="close-budget-modal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="budget-form">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Total Monthly Budget</label>
+                        <input type="number" id="total-budget" step="0.01" min="0" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-fti-blue focus:border-fti-blue">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category Budgets (Optional)</label>
+                        <div id="category-budgets" class="space-y-2">
+                            <!-- Dynamic category budget inputs -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="button" id="cancel-budget-btn" 
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="flex-1 px-4 py-2 bg-fti-blue text-white rounded-lg hover:bg-fti-blue-dark">
+                            Save Budget
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}
