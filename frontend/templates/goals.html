@@ -1,23 +1,43 @@
 {% extends "base.html" %} {% block content %}
 <div class="min-h-screen bg-background-dark">
   <!-- Navbar -->
-  <nav class="sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 py-4">
+  <nav
+    class="sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 py-4"
+  >
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div class="bg-primary/20 p-1.5 rounded-lg">
           <span class="material-icons-round text-primary text-xl">savings</span>
         </div>
         <span class="text-white font-bold text-2xl tracking-tight">FTI</span>
-        <span class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block">Financial Intelligence</span>
+        <span
+          class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block"
+          >Financial Intelligence</span
+        >
       </div>
       <div class="hidden md:flex items-center gap-8">
-        <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/">Dashboard</a>
-        <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/transactions">Transactions</a>
-        <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/analytics">Analytics</a>
-        <a class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5" href="/goals">Goals</a>
+        <a
+          class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+          href="/"
+          >Dashboard</a
+        >
+        <a
+          class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+          href="/transactions"
+          >Transactions</a
+        >
+        <!-- <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/analytics">Analytics</a> -->
+        <a
+          class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5"
+          href="/goals"
+          >Goals</a
+        >
       </div>
       <div class="flex items-center gap-2">
-        <select id="currency-selector" class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer">
+        <select
+          id="currency-selector"
+          class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer"
+        >
           <option value="USD">$ USD</option>
           <option value="EUR">€ EUR</option>
           <option value="GBP">£ GBP</option>
@@ -25,18 +45,36 @@
           <option value="IDR">Rp IDR</option>
         </select>
         <div class="relative hidden sm:block">
-          <button id="notification-btn" class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+          <button
+            id="notification-btn"
+            class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5"
+          >
             <span class="material-icons-round text-xl">notifications</span>
-            <span id="notification-badge" class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"></span>
+            <span
+              id="notification-badge"
+              class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"
+            ></span>
           </button>
-          <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden">
-            <div class="p-4 border-b border-border-dark flex items-center justify-between">
+          <div
+            id="notification-dropdown"
+            class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden"
+          >
+            <div
+              class="p-4 border-b border-border-dark flex items-center justify-between"
+            >
               <h3 class="font-semibold text-white">Notifications</h3>
-              <button id="mark-all-read" class="text-xs text-primary hover:text-white">Mark all read</button>
+              <button
+                id="mark-all-read"
+                class="text-xs text-primary hover:text-white"
+              >
+                Mark all read
+              </button>
             </div>
             <div id="notification-list" class="overflow-y-auto max-h-80">
               <div class="p-8 text-center text-text-muted">
-                <span class="material-icons-round text-4xl mb-2 opacity-50">notifications_none</span>
+                <span class="material-icons-round text-4xl mb-2 opacity-50"
+                  >notifications_none</span
+                >
                 <p>No notifications</p>
               </div>
             </div>
@@ -47,11 +85,18 @@
             <p class="text-xs font-semibold text-white" id="user-name">User</p>
             <p class="text-[10px] text-text-muted uppercase">Member</p>
           </div>
-          <button id="logout-btn" class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all" title="Logout">
+          <button
+            id="logout-btn"
+            class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all"
+            title="Logout"
+          >
             <span class="material-icons-round text-sm">logout</span>
           </button>
         </div>
-        <button id="mobile-menu-btn" class="md:hidden text-text-muted hover:text-white transition-colors p-2">
+        <button
+          id="mobile-menu-btn"
+          class="md:hidden text-text-muted hover:text-white transition-colors p-2"
+        >
           <span class="material-icons-round text-xl">menu</span>
         </button>
       </div>
@@ -59,27 +104,45 @@
   </nav>
 
   <!-- Mobile Menu -->
-  <div id="mobile-menu" class="hidden md:hidden bg-surface-dark border-b border-border-dark">
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden bg-surface-dark border-b border-border-dark"
+  >
     <div class="px-4 py-3 space-y-3">
-      <a href="/" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
+      <a
+        href="/"
+        class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+      >
         <span class="material-icons-round text-sm">dashboard</span>
         <span>Dashboard</span>
       </a>
-      <a href="/transactions" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
+      <a
+        href="/transactions"
+        class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+      >
         <span class="material-icons-round text-sm">receipt_long</span>
         <span>Transactions</span>
       </a>
-      <a href="/analytics" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
+      <a
+        href="/analytics"
+        class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+      >
         <span class="material-icons-round text-sm">analytics</span>
         <span>Analytics</span>
       </a>
-      <a href="/goals" class="flex items-center gap-3 text-primary font-medium py-2">
+      <a
+        href="/goals"
+        class="flex items-center gap-3 text-primary font-medium py-2"
+      >
         <span class="material-icons-round text-sm">flag</span>
         <span>Goals</span>
       </a>
       <div class="pt-2 border-t border-border-dark">
         <label class="block text-xs text-text-muted mb-2">Currency</label>
-        <select id="currency-selector-mobile" class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg">
+        <select
+          id="currency-selector-mobile"
+          class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg"
+        >
           <option value="USD">$ USD</option>
           <option value="EUR">€ EUR</option>
           <option value="GBP">£ GBP</option>
@@ -96,7 +159,9 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-3xl font-bold text-white mb-2">Financial Goals</h1>
-          <p class="text-text-muted">Track your progress towards financial milestones</p>
+          <p class="text-text-muted">
+            Track your progress towards financial milestones
+          </p>
         </div>
         <button
           id="add-goal-btn"
@@ -109,16 +174,24 @@
     </div>
 
     <!-- Goals Grid -->
-    <div id="goals-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      id="goals-container"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
       <!-- Goals will be loaded here -->
     </div>
 
     <!-- Empty State -->
     <div id="empty-state" class="hidden text-center py-16">
       <div class="bg-surface-dark rounded-2xl p-12 border border-border-dark">
-        <span class="material-icons-round text-6xl text-text-muted opacity-50 mb-4">flag</span>
+        <span
+          class="material-icons-round text-6xl text-text-muted opacity-50 mb-4"
+          >flag</span
+        >
         <h3 class="text-xl font-semibold text-white mb-2">No Goals Yet</h3>
-        <p class="text-text-muted mb-6">Start by creating your first financial goal</p>
+        <p class="text-text-muted mb-6">
+          Start by creating your first financial goal
+        </p>
         <button
           class="bg-primary hover:bg-sky-500 text-white px-6 py-3 rounded-lg text-sm font-medium transition-all"
           onclick="$('#add-goal-btn').click()"
@@ -131,30 +204,49 @@
 </div>
 
 <!-- Loading Overlay -->
-<div id="loading-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-  <div class="bg-surface-dark rounded-2xl p-8 border border-border-dark shadow-card">
+<div
+  id="loading-overlay"
+  class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center"
+>
+  <div
+    class="bg-surface-dark rounded-2xl p-8 border border-border-dark shadow-card"
+  >
     <div class="flex flex-col items-center gap-4">
-      <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"
+      ></div>
       <p class="text-white font-medium">Loading...</p>
     </div>
   </div>
 </div>
 
 <!-- Add/Edit Goal Modal -->
-<div id="goal-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-  <div class="bg-surface-dark rounded-2xl shadow-card border border-border-dark max-w-md w-full">
-    <div class="p-6 border-b border-border-dark flex items-center justify-between">
+<div
+  id="goal-modal"
+  class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4"
+>
+  <div
+    class="bg-surface-dark rounded-2xl shadow-card border border-border-dark max-w-md w-full"
+  >
+    <div
+      class="p-6 border-b border-border-dark flex items-center justify-between"
+    >
       <h3 class="text-xl font-semibold text-white">Add Financial Goal</h3>
-      <button id="close-goal-modal" class="text-text-muted hover:text-white transition-colors">
+      <button
+        id="close-goal-modal"
+        class="text-text-muted hover:text-white transition-colors"
+      >
         <span class="material-icons-round">close</span>
       </button>
     </div>
 
     <form id="goal-form" class="p-6 space-y-4">
-      <input type="hidden" id="goal-id" value="">
+      <input type="hidden" id="goal-id" value="" />
 
       <div>
-        <label class="block text-sm font-medium text-text-muted mb-2">Goal Name</label>
+        <label class="block text-sm font-medium text-text-muted mb-2"
+          >Goal Name</label
+        >
         <input
           type="text"
           id="goal-name"
@@ -168,7 +260,9 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-muted mb-2">Target Amount</label>
+        <label class="block text-sm font-medium text-text-muted mb-2"
+          >Target Amount</label
+        >
         <input
           type="number"
           id="goal-amount"
@@ -183,7 +277,9 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-muted mb-2">Current Amount</label>
+        <label class="block text-sm font-medium text-text-muted mb-2"
+          >Current Amount</label
+        >
         <input
           type="number"
           id="goal-current"
@@ -197,7 +293,9 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-text-muted mb-2">Target Date</label>
+        <label class="block text-sm font-medium text-text-muted mb-2"
+          >Target Date</label
+        >
         <input
           type="date"
           id="goal-deadline"
@@ -229,41 +327,41 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   // Global variables
-  let currentCurrency = 'USD';
+  let currentCurrency = "USD";
   let currencySymbols = {
-      'USD': '$',
-      'EUR': '€',
-      'GBP': '£',
-      'JPY': '¥',
-      'IDR': 'Rp'
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+    JPY: "¥",
+    IDR: "Rp",
   };
-  
+
   // Loading & Error Handling
   function showLoading() {
-    $('#loading-overlay').removeClass('hidden');
+    $("#loading-overlay").removeClass("hidden");
   }
-  
+
   function hideLoading() {
-    $('#loading-overlay').addClass('hidden');
+    $("#loading-overlay").addClass("hidden");
   }
-  
+
   function showError(title, message) {
     hideLoading();
     Swal.fire({
-      icon: 'error',
-      title: title || 'Error',
-      text: message || 'Something went wrong. Please try again.',
-      confirmButtonColor: '#38bdf8'
+      icon: "error",
+      title: title || "Error",
+      text: message || "Something went wrong. Please try again.",
+      confirmButtonColor: "#38bdf8",
     });
   }
-  
+
   function showSuccess(title, message) {
     Swal.fire({
-      icon: 'success',
+      icon: "success",
       title: title,
       text: message,
       timer: 2000,
-      showConfirmButton: false
+      showConfirmButton: false,
     });
   }
 
@@ -300,90 +398,92 @@
     $("#logout-btn").click(() => logout());
     $("#notification-btn").click(() => toggleNotifications());
     $("#mark-all-read").click(() => markAllRead());
-    $('#currency-selector').change(function() {
+    $("#currency-selector").change(function () {
       saveCurrency($(this).val());
     });
-    
+
     // Mobile menu toggle
-    $('#mobile-menu-btn').click(function() {
-      $('#mobile-menu').toggleClass('hidden');
+    $("#mobile-menu-btn").click(function () {
+      $("#mobile-menu").toggleClass("hidden");
     });
-    
+
     // Sync mobile currency selector
-    $('#currency-selector-mobile').change(function() {
+    $("#currency-selector-mobile").change(function () {
       const currency = $(this).val();
-      $('#currency-selector').val(currency);
+      $("#currency-selector").val(currency);
       saveCurrency(currency);
     });
-    
+
     // Close dropdowns
-    $(document).click(function(e) {
-      if (!$(e.target).closest("#notification-btn, #notification-dropdown").length) {
+    $(document).click(function (e) {
+      if (
+        !$(e.target).closest("#notification-btn, #notification-dropdown").length
+      ) {
         $("#notification-dropdown").addClass("hidden");
       }
-      if (!$(e.target).closest('#mobile-menu-btn, #mobile-menu').length) {
-        $('#mobile-menu').addClass('hidden');
+      if (!$(e.target).closest("#mobile-menu-btn, #mobile-menu").length) {
+        $("#mobile-menu").addClass("hidden");
       }
     });
   });
 
   function loadCurrency() {
     $.ajax({
-      url: '/api/settings/currency',
-      method: 'GET',
-      success: function(data) {
-        currentCurrency = data.currency || 'USD';
-        $('#currency-selector').val(currentCurrency);
-        $('#currency-selector-mobile').val(currentCurrency);
-      }
+      url: "/api/settings/currency",
+      method: "GET",
+      success: function (data) {
+        currentCurrency = data.currency || "USD";
+        $("#currency-selector").val(currentCurrency);
+        $("#currency-selector-mobile").val(currentCurrency);
+      },
     });
   }
   function saveCurrency(currency) {
     $.ajax({
-      url: '/api/settings/currency',
-      method: 'POST',
-      contentType: 'application/json',
+      url: "/api/settings/currency",
+      method: "POST",
+      contentType: "application/json",
       data: JSON.stringify({ currency: currency }),
-      success: function() {
+      success: function () {
         currentCurrency = currency;
         loadGoals();
         Swal.fire({
-          icon: 'success',
-          title: 'Currency Updated',
+          icon: "success",
+          title: "Currency Updated",
           timer: 1500,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
-      }
+      },
     });
   }
-  
+
   function loadNotifications() {
     $.ajax({
-      url: '/api/alerts',
-      method: 'GET',
-      success: function(data) {
-        const unreadCount = (data.alerts || []).filter(a => !a.read).length;
+      url: "/api/alerts",
+      method: "GET",
+      success: function (data) {
+        const unreadCount = (data.alerts || []).filter((a) => !a.read).length;
         if (unreadCount > 0) {
-          $('#notification-badge').removeClass('hidden');
+          $("#notification-badge").removeClass("hidden");
         }
-      }
+      },
     });
   }
-  
+
   function toggleNotifications() {
-    $('#notification-dropdown').toggleClass('hidden');
+    $("#notification-dropdown").toggleClass("hidden");
   }
-  
+
   function markAllRead() {
     $.ajax({
-      url: '/api/alerts/mark-read',
-      method: 'POST',
-      success: function() {
-        $('#notification-badge').addClass('hidden');
-      }
+      url: "/api/alerts/mark-read",
+      method: "POST",
+      success: function () {
+        $("#notification-badge").addClass("hidden");
+      },
     });
   }
-  
+
   function logout() {
     Swal.fire({
       title: "Logout?",
@@ -402,7 +502,7 @@
 
   function loadGoals() {
     showLoading();
-    
+
     $.ajax({
       url: "/api/goals",
       method: "GET",
@@ -419,7 +519,7 @@
 
   function renderGoals(goals) {
     const container = $("#goals-container");
-    const symbol = currencySymbols[currentCurrency] || '$';
+    const symbol = currencySymbols[currentCurrency] || "$";
 
     if (goals.length === 0) {
       container.html("");
@@ -431,18 +531,23 @@
     let html = "";
 
     goals.forEach((goal) => {
-      const progress = Math.min((goal.current_amount / goal.target_amount) * 100, 100);
+      const progress = Math.min(
+        (goal.current_amount / goal.target_amount) * 100,
+        100
+      );
       const remaining = goal.target_amount - goal.current_amount;
-      const daysLeft = Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24));
-      
-      let statusColor = 'primary';
-      let statusText = 'In Progress';
+      const daysLeft = Math.ceil(
+        (new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24)
+      );
+
+      let statusColor = "primary";
+      let statusText = "In Progress";
       if (progress >= 100) {
-        statusColor = 'success';
-        statusText = 'Completed';
+        statusColor = "success";
+        statusText = "Completed";
       } else if (daysLeft < 0) {
-        statusColor = 'danger';
-        statusText = 'Overdue';
+        statusColor = "danger";
+        statusText = "Overdue";
       }
 
       html += `
@@ -458,10 +563,14 @@
               </div>
             </div>
             <div class="flex gap-2">
-              <button onclick="editGoal('${goal._id}')" class="text-text-muted hover:text-primary transition-colors">
+              <button onclick="editGoal('${
+                goal._id
+              }')" class="text-text-muted hover:text-primary transition-colors">
                 <span class="material-icons-round text-sm">edit</span>
               </button>
-              <button onclick="deleteGoal('${goal._id}')" class="text-text-muted hover:text-danger transition-colors">
+              <button onclick="deleteGoal('${
+                goal._id
+              }')" class="text-text-muted hover:text-danger transition-colors">
                 <span class="material-icons-round text-sm">delete</span>
               </button>
             </div>
@@ -471,7 +580,9 @@
             <div>
               <div class="flex justify-between text-sm mb-2">
                 <span class="text-text-muted">Progress</span>
-                <span class="font-semibold text-white">${progress.toFixed(0)}%</span>
+                <span class="font-semibold text-white">${progress.toFixed(
+                  0
+                )}%</span>
               </div>
               <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden">
                 <div class="bg-gradient-to-r from-primary to-sky-400 h-full rounded-full transition-all duration-500" style="width: ${progress}%"></div>
@@ -492,11 +603,16 @@
             <div class="pt-2 border-t border-border-dark">
               <div class="flex items-center justify-between text-sm">
                 <span class="text-text-muted">Remaining</span>
-                <span class="font-semibold text-white">${symbol}${Math.max(0, remaining).toLocaleString()}</span>
+                <span class="font-semibold text-white">${symbol}${Math.max(
+        0,
+        remaining
+      ).toLocaleString()}</span>
               </div>
               <div class="flex items-center justify-between text-sm mt-2">
                 <span class="text-text-muted">Deadline</span>
-                <span class="font-semibold ${daysLeft < 0 ? 'text-danger' : 'text-white'}">${new Date(goal.deadline).toLocaleDateString()}</span>
+                <span class="font-semibold ${
+                  daysLeft < 0 ? "text-danger" : "text-white"
+                }">${new Date(goal.deadline).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
@@ -535,14 +651,17 @@
     const targetAmount = parseFloat($("#goal-amount").val());
     const currentAmount = parseFloat($("#goal-current").val()) || 0;
     const deadline = $("#goal-deadline").val();
-    
+
     // Validation
     if (!name || name.length < 3) {
       showError("Validation Error", "Goal name must be at least 3 characters");
       return;
     }
     if (name.length > 100) {
-      showError("Validation Error", "Goal name is too long (max 100 characters)");
+      showError(
+        "Validation Error",
+        "Goal name is too long (max 100 characters)"
+      );
       return;
     }
     if (!targetAmount || isNaN(targetAmount) || targetAmount <= 0) {
@@ -558,18 +677,21 @@
       return;
     }
     if (currentAmount > targetAmount) {
-      showError("Validation Error", "Current amount cannot exceed target amount");
+      showError(
+        "Validation Error",
+        "Current amount cannot exceed target amount"
+      );
       return;
     }
     if (!deadline) {
       showError("Validation Error", "Target date is required");
       return;
     }
-    
+
     const deadlineDate = new Date(deadline);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     if (deadlineDate < today) {
       showError("Validation Error", "Target date must be in the future");
       return;
@@ -595,7 +717,10 @@
       success: function () {
         hideGoalModal();
         loadGoals();
-        showSuccess(goalId ? "Goal Updated" : "Goal Created", "Your goal has been saved successfully");
+        showSuccess(
+          goalId ? "Goal Updated" : "Goal Created",
+          "Your goal has been saved successfully"
+        );
       },
       error: function (xhr) {
         const errorMsg = xhr.responseJSON?.error || "Failed to save goal";
@@ -628,7 +753,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         showLoading();
-        
+
         $.ajax({
           url: `/api/goals/${goalId}`,
           method: "DELETE",

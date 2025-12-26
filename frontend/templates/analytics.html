@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Financial Analytics - FTI</title>
@@ -8,711 +8,921 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
+      rel="stylesheet"
+    />
     <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#38bdf8",
-                        secondary: "#94a3b8",
-                        success: "#34d399",
-                        warning: "#fbbf24",
-                        danger: "#f87171",
-                        "background-dark": "#0B1120",
-                        "surface-dark": "#151F32",
-                        "surface-dark-hover": "#1E293B",
-                        "border-dark": "#1E293B",
-                        "text-main": "#f1f5f9",
-                        "text-muted": "#94a3b8",
-                    },
-                    fontFamily: {
-                        sans: ["Inter", "sans-serif"],
-                    },
-                },
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#38bdf8",
+              secondary: "#94a3b8",
+              success: "#34d399",
+              warning: "#fbbf24",
+              danger: "#f87171",
+              "background-dark": "#0B1120",
+              "surface-dark": "#151F32",
+              "surface-dark-hover": "#1E293B",
+              "border-dark": "#1E293B",
+              "text-main": "#f1f5f9",
+              "text-muted": "#94a3b8",
             },
-        };
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
     </script>
-</head>
-<body class="bg-background-dark text-text-main font-sans">
+  </head>
+  <body class="bg-background-dark text-text-main font-sans">
     <!-- Navigation -->
-    <nav class="sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="bg-primary/20 p-1.5 rounded-lg">
-                    <span class="material-icons-round text-primary text-xl">savings</span>
-                </div>
-                <span class="text-white font-bold text-2xl tracking-tight">FTI</span>
-                <span class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block">Financial Intelligence</span>
-            </div>
-            <div class="hidden md:flex items-center gap-8">
-                <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/">Dashboard</a>
-                <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/transactions">Transactions</a>
-                <a class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5" href="/analytics">Analytics</a>
-                <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/goals">Goals</a>
-            </div>
-            <div class="flex items-center gap-2">
-                <select id="currency-selector" class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer">
-                    <option value="USD">$ USD</option>
-                    <option value="EUR">€ EUR</option>
-                    <option value="GBP">£ GBP</option>
-                    <option value="JPY">¥ JPY</option>
-                    <option value="IDR">Rp IDR</option>
-                </select>
-                <div class="relative hidden sm:block">
-                    <button id="notification-btn" class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
-                        <span class="material-icons-round text-xl">notifications</span>
-                        <span id="notification-badge" class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"></span>
-                    </button>
-                    <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden">
-                        <div class="p-4 border-b border-border-dark flex items-center justify-between">
-                            <h3 class="font-semibold text-white">Notifications</h3>
-                            <button id="mark-all-read" class="text-xs text-primary hover:text-white">Mark all read</button>
-                        </div>
-                        <div id="notification-list" class="overflow-y-auto max-h-80">
-                            <div class="p-8 text-center text-text-muted">
-                                <span class="material-icons-round text-4xl mb-2 opacity-50">notifications_none</span>
-                                <p>No notifications</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 pl-4 border-l border-border-dark">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-xs font-semibold text-white" id="user-name">User</p>
-                        <p class="text-[10px] text-text-muted uppercase">Member</p>
-                    </div>
-                    <button id="logout-btn" class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all" title="Logout">
-                        <span class="material-icons-round text-sm">logout</span>
-                    </button>
-                </div>
-                <button id="mobile-menu-btn" class="md:hidden text-text-muted hover:text-white transition-colors p-2">
-                    <span class="material-icons-round text-xl">menu</span>
-                </button>
-            </div>
+    <nav
+      class="sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 py-4"
+    >
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="bg-primary/20 p-1.5 rounded-lg">
+            <span class="material-icons-round text-primary text-xl"
+              >savings</span
+            >
+          </div>
+          <span class="text-white font-bold text-2xl tracking-tight">FTI</span>
+          <span
+            class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block"
+            >Financial Intelligence</span
+          >
         </div>
+        <div class="hidden md:flex items-center gap-8">
+          <a
+            class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+            href="/"
+            >Dashboard</a
+          >
+          <a
+            class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+            href="/transactions"
+            >Transactions</a
+          >
+          <!-- <a class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5" href="/analytics">Analytics</a> -->
+          <a
+            class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+            href="/goals"
+            >Goals</a
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <select
+            id="currency-selector"
+            class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer"
+          >
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+            <option value="GBP">£ GBP</option>
+            <option value="JPY">¥ JPY</option>
+            <option value="IDR">Rp IDR</option>
+          </select>
+          <div class="relative hidden sm:block">
+            <button
+              id="notification-btn"
+              class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5"
+            >
+              <span class="material-icons-round text-xl">notifications</span>
+              <span
+                id="notification-badge"
+                class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"
+              ></span>
+            </button>
+            <div
+              id="notification-dropdown"
+              class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden"
+            >
+              <div
+                class="p-4 border-b border-border-dark flex items-center justify-between"
+              >
+                <h3 class="font-semibold text-white">Notifications</h3>
+                <button
+                  id="mark-all-read"
+                  class="text-xs text-primary hover:text-white"
+                >
+                  Mark all read
+                </button>
+              </div>
+              <div id="notification-list" class="overflow-y-auto max-h-80">
+                <div class="p-8 text-center text-text-muted">
+                  <span class="material-icons-round text-4xl mb-2 opacity-50"
+                    >notifications_none</span
+                  >
+                  <p>No notifications</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 pl-4 border-l border-border-dark">
+            <div class="text-right hidden sm:block">
+              <p class="text-xs font-semibold text-white" id="user-name">
+                User
+              </p>
+              <p class="text-[10px] text-text-muted uppercase">Member</p>
+            </div>
+            <button
+              id="logout-btn"
+              class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all"
+              title="Logout"
+            >
+              <span class="material-icons-round text-sm">logout</span>
+            </button>
+          </div>
+          <button
+            id="mobile-menu-btn"
+            class="md:hidden text-text-muted hover:text-white transition-colors p-2"
+          >
+            <span class="material-icons-round text-xl">menu</span>
+          </button>
+        </div>
+      </div>
     </nav>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-surface-dark border-b border-border-dark">
-        <div class="px-4 py-3 space-y-3">
-            <a href="/" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
-                <span class="material-icons-round text-sm">dashboard</span>
-                <span>Dashboard</span>
-            </a>
-            <a href="/transactions" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
-                <span class="material-icons-round text-sm">receipt_long</span>
-                <span>Transactions</span>
-            </a>
-            <a href="/analytics" class="flex items-center gap-3 text-primary font-medium py-2">
-                <span class="material-icons-round text-sm">analytics</span>
-                <span>Analytics</span>
-            </a>
-            <a href="/goals" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
-                <span class="material-icons-round text-sm">flag</span>
-                <span>Goals</span>
-            </a>
-            <div class="pt-2 border-t border-border-dark">
-                <label class="block text-xs text-text-muted mb-2">Currency</label>
-                <select id="currency-selector-mobile" class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg">
-                    <option value="USD">$ USD</option>
-                    <option value="EUR">€ EUR</option>
-                    <option value="GBP">£ GBP</option>
-                    <option value="JPY">¥ JPY</option>
-                    <option value="IDR">Rp IDR</option>
-                </select>
-            </div>
+    <div
+      id="mobile-menu"
+      class="hidden md:hidden bg-surface-dark border-b border-border-dark"
+    >
+      <div class="px-4 py-3 space-y-3">
+        <a
+          href="/"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a
+          href="/transactions"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">receipt_long</span>
+          <span>Transactions</span>
+        </a>
+        <a
+          href="/analytics"
+          class="flex items-center gap-3 text-primary font-medium py-2"
+        >
+          <span class="material-icons-round text-sm">analytics</span>
+          <span>Analytics</span>
+        </a>
+        <a
+          href="/goals"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">flag</span>
+          <span>Goals</span>
+        </a>
+        <div class="pt-2 border-t border-border-dark">
+          <label class="block text-xs text-text-muted mb-2">Currency</label>
+          <select
+            id="currency-selector-mobile"
+            class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg"
+          >
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+            <option value="GBP">£ GBP</option>
+            <option value="JPY">¥ JPY</option>
+            <option value="IDR">Rp IDR</option>
+          </select>
         </div>
+      </div>
     </div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 py-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-text-main mb-2">Financial Analytics</h1>
-            <p class="text-text-muted">Deep insights into your financial behavior and trends</p>
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-text-main mb-2">
+          Financial Analytics
+        </h1>
+        <p class="text-text-muted">
+          Deep insights into your financial behavior and trends
+        </p>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading" class="text-center py-12">
+        <span class="material-icons-round animate-spin text-primary text-3xl"
+          >analytics</span
+        >
+        <p class="text-text-muted mt-4">Analyzing your financial data...</p>
+      </div>
+
+      <!-- Analytics Content -->
+      <div id="analytics-content" class="hidden space-y-8">
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-icons-round text-success">trending_up</span>
+              <span class="text-xs text-text-muted">THIS MONTH</span>
+            </div>
+            <div class="text-2xl font-bold text-text-main" id="savings-rate">
+              0%
+            </div>
+            <div class="text-sm text-text-muted">Savings Rate</div>
+          </div>
+
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-icons-round text-warning">show_chart</span>
+              <span class="text-xs text-text-muted">VOLATILITY</span>
+            </div>
+            <div
+              class="text-2xl font-bold text-text-main"
+              id="expense-volatility"
+            >
+              0%
+            </div>
+            <div class="text-sm text-text-muted">Expense Variation</div>
+          </div>
+
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-icons-round text-primary">receipt</span>
+              <span class="text-xs text-text-muted">AVERAGE</span>
+            </div>
+            <div class="text-2xl font-bold text-text-main" id="avg-transaction">
+              Rp0
+            </div>
+            <div class="text-sm text-text-muted">Transaction Size</div>
+          </div>
+
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <span class="material-icons-round text-danger"
+                >calendar_today</span
+              >
+              <span class="text-xs text-text-muted">PEAK DAY</span>
+            </div>
+            <div
+              class="text-lg font-bold text-text-main"
+              id="peak-spending-day"
+            >
+              N/A
+            </div>
+            <div class="text-sm text-text-muted">Highest Spending</div>
+          </div>
         </div>
 
-        <!-- Loading State -->
-        <div id="loading" class="text-center py-12">
-            <span class="material-icons-round animate-spin text-primary text-3xl">analytics</span>
-            <p class="text-text-muted mt-4">Analyzing your financial data...</p>
+        <!-- Charts Row 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Monthly Trends -->
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <h3 class="text-lg font-semibold text-text-main mb-4">
+              Monthly Trends
+            </h3>
+            <div class="h-48">
+              <canvas id="monthly-trends-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- FTI Score Breakdown -->
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <h3 class="text-lg font-semibold text-text-main mb-4">
+              FTI Score Breakdown
+            </h3>
+            <div class="h-48">
+              <canvas id="fti-breakdown-chart"></canvas>
+            </div>
+          </div>
         </div>
 
-        <!-- Analytics Content -->
-        <div id="analytics-content" class="hidden space-y-8">
-            <!-- Key Metrics -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="material-icons-round text-success">trending_up</span>
-                        <span class="text-xs text-text-muted">THIS MONTH</span>
-                    </div>
-                    <div class="text-2xl font-bold text-text-main" id="savings-rate">0%</div>
-                    <div class="text-sm text-text-muted">Savings Rate</div>
-                </div>
-
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="material-icons-round text-warning">show_chart</span>
-                        <span class="text-xs text-text-muted">VOLATILITY</span>
-                    </div>
-                    <div class="text-2xl font-bold text-text-main" id="expense-volatility">0%</div>
-                    <div class="text-sm text-text-muted">Expense Variation</div>
-                </div>
-
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="material-icons-round text-primary">receipt</span>
-                        <span class="text-xs text-text-muted">AVERAGE</span>
-                    </div>
-                    <div class="text-2xl font-bold text-text-main" id="avg-transaction">Rp0</div>
-                    <div class="text-sm text-text-muted">Transaction Size</div>
-                </div>
-
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="material-icons-round text-danger">calendar_today</span>
-                        <span class="text-xs text-text-muted">PEAK DAY</span>
-                    </div>
-                    <div class="text-lg font-bold text-text-main" id="peak-spending-day">N/A</div>
-                    <div class="text-sm text-text-muted">Highest Spending</div>
-                </div>
+        <!-- Charts Row 2 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Category Breakdown -->
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <h3 class="text-lg font-semibold text-text-main mb-4">
+              Spending by Category
+            </h3>
+            <div class="h-48">
+              <canvas id="category-chart"></canvas>
             </div>
+          </div>
 
-            <!-- Charts Row 1 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Monthly Trends -->
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <h3 class="text-lg font-semibold text-text-main mb-4">Monthly Trends</h3>
-                    <div class="h-48">
-                        <canvas id="monthly-trends-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- FTI Score Breakdown -->
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <h3 class="text-lg font-semibold text-text-main mb-4">FTI Score Breakdown</h3>
-                    <div class="h-48">
-                        <canvas id="fti-breakdown-chart"></canvas>
-                    </div>
-                </div>
+          <!-- Daily Spending Pattern -->
+          <div
+            class="bg-surface-dark rounded-2xl border border-border-dark p-6"
+          >
+            <h3 class="text-lg font-semibold text-text-main mb-4">
+              Weekly Spending Pattern
+            </h3>
+            <div class="h-48">
+              <canvas id="daily-pattern-chart"></canvas>
             </div>
-
-            <!-- Charts Row 2 -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Category Breakdown -->
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <h3 class="text-lg font-semibold text-text-main mb-4">Spending by Category</h3>
-                    <div class="h-48">
-                        <canvas id="category-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Daily Spending Pattern -->
-                <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                    <h3 class="text-lg font-semibold text-text-main mb-4">Weekly Spending Pattern</h3>
-                    <div class="h-48">
-                        <canvas id="daily-pattern-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Goals Analysis -->
-            <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                <h3 class="text-lg font-semibold text-text-main mb-6">Goals Analysis</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-primary" id="total-goals">0</div>
-                        <div class="text-sm text-text-muted">Total Goals</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-success" id="completed-goals">0</div>
-                        <div class="text-sm text-text-muted">Completed</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-warning" id="progress-goals">0</div>
-                        <div class="text-sm text-text-muted">In Progress</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-text-main" id="completion-rate">0%</div>
-                        <div class="text-sm text-text-muted">Completion Rate</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Insights & Recommendations -->
-            <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
-                <h3 class="text-lg font-semibold text-text-main mb-4">AI Insights & Recommendations</h3>
-                <div id="insights-list" class="space-y-3">
-                    <!-- Insights will be generated here -->
-                </div>
-            </div>
+          </div>
         </div>
+
+        <!-- Goals Analysis -->
+        <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
+          <h3 class="text-lg font-semibold text-text-main mb-6">
+            Goals Analysis
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-primary" id="total-goals">
+                0
+              </div>
+              <div class="text-sm text-text-muted">Total Goals</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-success" id="completed-goals">
+                0
+              </div>
+              <div class="text-sm text-text-muted">Completed</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-warning" id="progress-goals">
+                0
+              </div>
+              <div class="text-sm text-text-muted">In Progress</div>
+            </div>
+            <div class="text-center">
+              <div
+                class="text-3xl font-bold text-text-main"
+                id="completion-rate"
+              >
+                0%
+              </div>
+              <div class="text-sm text-text-muted">Completion Rate</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Insights & Recommendations -->
+        <div class="bg-surface-dark rounded-2xl border border-border-dark p-6">
+          <h3 class="text-lg font-semibold text-text-main mb-4">
+            AI Insights & Recommendations
+          </h3>
+          <div id="insights-list" class="space-y-3">
+            <!-- Insights will be generated here -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
-        let analyticsData = null;
+      let analyticsData = null;
 
-        $(document).ready(function() {
-            // Check authentication
-            const token = localStorage.getItem('fti_token');
-            if (!token) {
-                window.location.href = '/login';
-                return;
-            }
-
-            // Setup AJAX defaults
-            $.ajaxSetup({
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-                },
-                error: function(xhr) {
-                    if (xhr.status === 401) {
-                        localStorage.removeItem('fti_token');
-                        window.location.href = '/login';
-                    }
-                }
-            });
-
-            // Load analytics data
-            loadAnalytics();
-
-            // Navbar functionality
-            $('#logout-btn').click(function() {
-                localStorage.removeItem('fti_token');
-                window.location.href = '/login';
-            });
-
-            $('#mobile-menu-btn').click(function() {
-                $('#mobile-menu').toggleClass('hidden');
-            });
-
-            $('#notification-btn').click(function() {
-                $('#notification-dropdown').toggleClass('hidden');
-            });
-
-            // Close dropdowns when clicking outside
-            $(document).click(function(e) {
-                if (!$(e.target).closest('#notification-btn, #notification-dropdown').length) {
-                    $('#notification-dropdown').addClass('hidden');
-                }
-                if (!$(e.target).closest('#mobile-menu-btn, #mobile-menu').length) {
-                    $('#mobile-menu').addClass('hidden');
-                }
-            });
-        });
-
-        function loadAnalytics() {
-            console.log('Starting analytics load...');
-            
-            // Force hide loading after 3 seconds regardless
-            setTimeout(() => {
-                console.log('Force hiding loading screen');
-                $('#loading').addClass('hidden');
-                $('#analytics-content').removeClass('hidden');
-            }, 3000);
-
-            $.get('/api/analytics/overview')
-                .done(function(data) {
-                    console.log('Analytics API success:', data);
-                    analyticsData = data;
-                    displayAnalytics(data);
-                    $('#loading').addClass('hidden');
-                    $('#analytics-content').removeClass('hidden');
-                })
-                .fail(function(xhr, status, error) {
-                    console.error('Analytics API failed:', status, error);
-                    $('#loading').addClass('hidden');
-                    $('#analytics-content').removeClass('hidden');
-                    
-                    displayMockAnalytics();
-                });
+      $(document).ready(function () {
+        // Check authentication
+        const token = localStorage.getItem("fti_token");
+        if (!token) {
+          window.location.href = "/login";
+          return;
         }
 
-        function displayMockAnalytics() {
-            // Show basic mock data when real data fails
-            const mockData = {
-                health_metrics: {
-                    savings_rate: 0,
-                    expense_volatility: 0,
-                    average_transaction_size: { average: 0 },
-                    top_spending_day: { date: 'N/A' }
-                },
-                goals_analysis: {
-                    total_goals: 0,
-                    completed: 0,
-                    in_progress: 0,
-                    completion_rate: 0
-                },
-                monthly_trends: [
-                    { month: 'Dec 2024', income: 0, expenses: 0 },
-                    { month: 'Nov 2024', income: 0, expenses: 0 },
-                    { month: 'Oct 2024', income: 0, expenses: 0 }
-                ],
-                fti_score_breakdown: {
-                    cash_flow: 0, spending_control: 0, savings_discipline: 0,
-                    stability: 0, debt_management: 0, goal_progress: 0
-                },
-                category_breakdown: [],
-                spending_patterns: { daily_pattern: [] }
-            };
-            
-            displayAnalytics(mockData);
-            
-            // Add message about needing more data
-            $('#insights-list').html(`
+        // Setup AJAX defaults
+        $.ajaxSetup({
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+          },
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              localStorage.removeItem("fti_token");
+              window.location.href = "/login";
+            }
+          },
+        });
+
+        // Load analytics data
+        loadAnalytics();
+
+        // Navbar functionality
+        $("#logout-btn").click(function () {
+          localStorage.removeItem("fti_token");
+          window.location.href = "/login";
+        });
+
+        $("#mobile-menu-btn").click(function () {
+          $("#mobile-menu").toggleClass("hidden");
+        });
+
+        $("#notification-btn").click(function () {
+          $("#notification-dropdown").toggleClass("hidden");
+        });
+
+        // Close dropdowns when clicking outside
+        $(document).click(function (e) {
+          if (
+            !$(e.target).closest("#notification-btn, #notification-dropdown")
+              .length
+          ) {
+            $("#notification-dropdown").addClass("hidden");
+          }
+          if (!$(e.target).closest("#mobile-menu-btn, #mobile-menu").length) {
+            $("#mobile-menu").addClass("hidden");
+          }
+        });
+      });
+
+      function loadAnalytics() {
+        console.log("Starting analytics load...");
+
+        // Force hide loading after 3 seconds regardless
+        setTimeout(() => {
+          console.log("Force hiding loading screen");
+          $("#loading").addClass("hidden");
+          $("#analytics-content").removeClass("hidden");
+        }, 3000);
+
+        $.get("/api/analytics/overview")
+          .done(function (data) {
+            console.log("Analytics API success:", data);
+            analyticsData = data;
+            displayAnalytics(data);
+            $("#loading").addClass("hidden");
+            $("#analytics-content").removeClass("hidden");
+          })
+          .fail(function (xhr, status, error) {
+            console.error("Analytics API failed:", status, error);
+            $("#loading").addClass("hidden");
+            $("#analytics-content").removeClass("hidden");
+
+            displayMockAnalytics();
+          });
+      }
+
+      function displayMockAnalytics() {
+        // Show basic mock data when real data fails
+        const mockData = {
+          health_metrics: {
+            savings_rate: 0,
+            expense_volatility: 0,
+            average_transaction_size: { average: 0 },
+            top_spending_day: { date: "N/A" },
+          },
+          goals_analysis: {
+            total_goals: 0,
+            completed: 0,
+            in_progress: 0,
+            completion_rate: 0,
+          },
+          monthly_trends: [
+            { month: "Dec 2024", income: 0, expenses: 0 },
+            { month: "Nov 2024", income: 0, expenses: 0 },
+            { month: "Oct 2024", income: 0, expenses: 0 },
+          ],
+          fti_score_breakdown: {
+            cash_flow: 0,
+            spending_control: 0,
+            savings_discipline: 0,
+            stability: 0,
+            debt_management: 0,
+            goal_progress: 0,
+          },
+          category_breakdown: [],
+          spending_patterns: { daily_pattern: [] },
+        };
+
+        displayAnalytics(mockData);
+
+        // Add message about needing more data
+        $("#insights-list").html(`
                 <div class="flex items-start gap-3 p-4 rounded-xl border border-primary/20 bg-primary/10 text-primary">
                     <span class="material-icons-round text-xl">info</span>
                     <p class="text-sm">Start adding transactions to see detailed financial analytics and insights!</p>
                 </div>
             `);
-        }
+      }
 
-        function displayAnalytics(data) {
-            console.log('Displaying analytics data:', data);
-            
+      function displayAnalytics(data) {
+        console.log("Displaying analytics data:", data);
+
+        try {
+          // Update key metrics with safe fallbacks
+          $("#savings-rate").text(
+            Math.round(data.health_metrics?.savings_rate || 0) + "%"
+          );
+          $("#expense-volatility").text(
+            Math.round(data.health_metrics?.expense_volatility || 0) + "%"
+          );
+          $("#avg-transaction").text(
+            "Rp" +
+              Math.round(
+                data.health_metrics?.average_transaction_size?.average || 0
+              ).toLocaleString()
+          );
+          $("#peak-spending-day").text(
+            data.health_metrics?.top_spending_day?.date || "N/A"
+          );
+
+          // Update goals analysis
+          $("#total-goals").text(data.goals_analysis?.total_goals || 0);
+          $("#completed-goals").text(data.goals_analysis?.completed || 0);
+          $("#progress-goals").text(data.goals_analysis?.in_progress || 0);
+          $("#completion-rate").text(
+            Math.round(data.goals_analysis?.completion_rate || 0) + "%"
+          );
+
+          // Create charts with error handling
+          setTimeout(() => {
             try {
-                // Update key metrics with safe fallbacks
-                $('#savings-rate').text(Math.round(data.health_metrics?.savings_rate || 0) + '%');
-                $('#expense-volatility').text(Math.round(data.health_metrics?.expense_volatility || 0) + '%');
-                $('#avg-transaction').text('Rp' + Math.round(data.health_metrics?.average_transaction_size?.average || 0).toLocaleString());
-                $('#peak-spending-day').text(data.health_metrics?.top_spending_day?.date || 'N/A');
+              createMonthlyTrendsChart(data.monthly_trends || []);
+            } catch (e) {
+              console.error("Monthly trends chart error:", e);
+              $("#monthly-trends-chart")
+                .parent()
+                .html(
+                  '<p class="text-center text-text-muted py-8">Chart unavailable</p>'
+                );
+            }
+          }, 100);
 
-                // Update goals analysis
-                $('#total-goals').text(data.goals_analysis?.total_goals || 0);
-                $('#completed-goals').text(data.goals_analysis?.completed || 0);
-                $('#progress-goals').text(data.goals_analysis?.in_progress || 0);
-                $('#completion-rate').text(Math.round(data.goals_analysis?.completion_rate || 0) + '%');
+          setTimeout(() => {
+            try {
+              createFTIBreakdownChart(data.fti_score_breakdown || {});
+            } catch (e) {
+              console.error("FTI breakdown chart error:", e);
+              $("#fti-breakdown-chart")
+                .parent()
+                .html(
+                  '<p class="text-center text-text-muted py-8">Chart unavailable</p>'
+                );
+            }
+          }, 200);
 
-                // Create charts with error handling
-                setTimeout(() => {
-                    try {
-                        createMonthlyTrendsChart(data.monthly_trends || []);
-                    } catch (e) {
-                        console.error('Monthly trends chart error:', e);
-                        $('#monthly-trends-chart').parent().html('<p class="text-center text-text-muted py-8">Chart unavailable</p>');
-                    }
-                }, 100);
-                
-                setTimeout(() => {
-                    try {
-                        createFTIBreakdownChart(data.fti_score_breakdown || {});
-                    } catch (e) {
-                        console.error('FTI breakdown chart error:', e);
-                        $('#fti-breakdown-chart').parent().html('<p class="text-center text-text-muted py-8">Chart unavailable</p>');
-                    }
-                }, 200);
-                
-                setTimeout(() => {
-                    try {
-                        createCategoryChart(data.category_breakdown || []);
-                    } catch (e) {
-                        console.error('Category chart error:', e);
-                        $('#category-chart').parent().html('<p class="text-center text-text-muted py-8">Chart unavailable</p>');
-                    }
-                }, 300);
-                
-                setTimeout(() => {
-                    try {
-                        createDailyPatternChart(data.spending_patterns?.daily_pattern || []);
-                    } catch (e) {
-                        console.error('Daily pattern chart error:', e);
-                        $('#daily-pattern-chart').parent().html('<p class="text-center text-text-muted py-8">Chart unavailable</p>');
-                    }
-                }, 400);
+          setTimeout(() => {
+            try {
+              createCategoryChart(data.category_breakdown || []);
+            } catch (e) {
+              console.error("Category chart error:", e);
+              $("#category-chart")
+                .parent()
+                .html(
+                  '<p class="text-center text-text-muted py-8">Chart unavailable</p>'
+                );
+            }
+          }, 300);
 
-                // Generate insights
-                setTimeout(() => {
-                    try {
-                        generateInsights(data);
-                    } catch (e) {
-                        console.error('Insights generation error:', e);
-                        $('#insights-list').html(`
+          setTimeout(() => {
+            try {
+              createDailyPatternChart(
+                data.spending_patterns?.daily_pattern || []
+              );
+            } catch (e) {
+              console.error("Daily pattern chart error:", e);
+              $("#daily-pattern-chart")
+                .parent()
+                .html(
+                  '<p class="text-center text-text-muted py-8">Chart unavailable</p>'
+                );
+            }
+          }, 400);
+
+          // Generate insights
+          setTimeout(() => {
+            try {
+              generateInsights(data);
+            } catch (e) {
+              console.error("Insights generation error:", e);
+              $("#insights-list").html(`
                             <div class="flex items-start gap-3 p-4 rounded-xl border border-primary/20 bg-primary/10 text-primary">
                                 <span class="material-icons-round text-xl">info</span>
                                 <p class="text-sm">Add more transactions to see personalized insights!</p>
                             </div>
                         `);
-                    }
-                }, 500);
-                
-                console.log('Analytics display completed successfully');
-                
-            } catch (error) {
-                console.error('Error displaying analytics:', error);
-                // Show basic fallback content
-                $('#savings-rate').text('0%');
-                $('#expense-volatility').text('0%');
-                $('#avg-transaction').text('Rp0');
-                $('#peak-spending-day').text('N/A');
-                $('#total-goals').text('0');
-                $('#completed-goals').text('0');
-                $('#progress-goals').text('0');
-                $('#completion-rate').text('0%');
             }
+          }, 500);
+
+          console.log("Analytics display completed successfully");
+        } catch (error) {
+          console.error("Error displaying analytics:", error);
+          // Show basic fallback content
+          $("#savings-rate").text("0%");
+          $("#expense-volatility").text("0%");
+          $("#avg-transaction").text("Rp0");
+          $("#peak-spending-day").text("N/A");
+          $("#total-goals").text("0");
+          $("#completed-goals").text("0");
+          $("#progress-goals").text("0");
+          $("#completion-rate").text("0%");
+        }
+      }
+
+      function createMonthlyTrendsChart(trends) {
+        const ctx = document
+          .getElementById("monthly-trends-chart")
+          .getContext("2d");
+
+        if (!trends || trends.length === 0) {
+          trends = [
+            { month: "Dec 2024", income: 0, expenses: 0 },
+            { month: "Nov 2024", income: 0, expenses: 0 },
+            { month: "Oct 2024", income: 0, expenses: 0 },
+          ];
         }
 
-        function createMonthlyTrendsChart(trends) {
-            const ctx = document.getElementById('monthly-trends-chart').getContext('2d');
-            
-            if (!trends || trends.length === 0) {
-                trends = [
-                    { month: 'Dec 2024', income: 0, expenses: 0 },
-                    { month: 'Nov 2024', income: 0, expenses: 0 },
-                    { month: 'Oct 2024', income: 0, expenses: 0 }
-                ];
-            }
-            
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: trends.map(t => t.month).reverse(),
-                    datasets: [{
-                        label: 'Income',
-                        data: trends.map(t => t.income || 0).reverse(),
-                        borderColor: '#34d399',
-                        backgroundColor: 'rgba(52, 211, 153, 0.1)',
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 4
-                    }, {
-                        label: 'Expenses',
-                        data: trends.map(t => t.expenses || 0).reverse(),
-                        borderColor: '#f87171',
-                        backgroundColor: 'rgba(248, 113, 113, 0.1)',
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 4
-                    }]
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: trends.map((t) => t.month).reverse(),
+            datasets: [
+              {
+                label: "Income",
+                data: trends.map((t) => t.income || 0).reverse(),
+                borderColor: "#34d399",
+                backgroundColor: "rgba(52, 211, 153, 0.1)",
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 4,
+              },
+              {
+                label: "Expenses",
+                data: trends.map((t) => t.expenses || 0).reverse(),
+                borderColor: "#f87171",
+                backgroundColor: "rgba(248, 113, 113, 0.1)",
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: "#f1f5f9", font: { size: 12 } },
+                position: "top",
+              },
+            },
+            scales: {
+              x: {
+                ticks: { color: "#94a3b8", font: { size: 11 } },
+                grid: { display: false },
+              },
+              y: {
+                ticks: { color: "#94a3b8", font: { size: 11 } },
+                grid: { color: "#1E293B" },
+              },
+            },
+            elements: {
+              point: { hoverRadius: 6 },
+            },
+          },
+        });
+      }
+
+      function createFTIBreakdownChart(breakdown) {
+        const ctx = document
+          .getElementById("fti-breakdown-chart")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "radar",
+          data: {
+            labels: [
+              "Cash Flow",
+              "Spending",
+              "Savings",
+              "Stability",
+              "Debt",
+              "Goals",
+            ],
+            datasets: [
+              {
+                label: "FTI Score",
+                data: [
+                  breakdown.cash_flow || 0,
+                  breakdown.spending_control || 0,
+                  breakdown.savings_discipline || 0,
+                  breakdown.stability || 0,
+                  breakdown.debt_management || 0,
+                  breakdown.goal_progress || 0,
+                ],
+                borderColor: "#38bdf8",
+                backgroundColor: "rgba(56, 189, 248, 0.15)",
+                pointBackgroundColor: "#38bdf8",
+                borderWidth: 2,
+                pointRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  color: "#94a3b8",
+                  font: { size: 10 },
+                  stepSize: 25,
+                  display: false,
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { 
-                            labels: { color: '#f1f5f9', font: { size: 12 } },
-                            position: 'top'
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            ticks: { color: '#94a3b8', font: { size: 11 } },
-                            grid: { display: false }
-                        },
-                        y: { 
-                            ticks: { color: '#94a3b8', font: { size: 11 } },
-                            grid: { color: '#1E293B' }
-                        }
-                    },
-                    elements: {
-                        point: { hoverRadius: 6 }
-                    }
-                }
-            });
-        }
-
-        function createFTIBreakdownChart(breakdown) {
-            const ctx = document.getElementById('fti-breakdown-chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: ['Cash Flow', 'Spending', 'Savings', 'Stability', 'Debt', 'Goals'],
-                    datasets: [{
-                        label: 'FTI Score',
-                        data: [
-                            breakdown.cash_flow || 0,
-                            breakdown.spending_control || 0,
-                            breakdown.savings_discipline || 0,
-                            breakdown.stability || 0,
-                            breakdown.debt_management || 0,
-                            breakdown.goal_progress || 0
-                        ],
-                        borderColor: '#38bdf8',
-                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                        pointBackgroundColor: '#38bdf8',
-                        borderWidth: 2,
-                        pointRadius: 4
-                    }]
+                grid: { color: "#1E293B" },
+                pointLabels: {
+                  color: "#94a3b8",
+                  font: { size: 11 },
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: { 
-                                color: '#94a3b8', 
-                                font: { size: 10 },
-                                stepSize: 25,
-                                display: false
-                            },
-                            grid: { color: '#1E293B' },
-                            pointLabels: { 
-                                color: '#94a3b8',
-                                font: { size: 11 }
-                            }
-                        }
-                    }
-                }
-            });
+              },
+            },
+          },
+        });
+      }
+
+      function createCategoryChart(categories) {
+        const ctx = document.getElementById("category-chart").getContext("2d");
+
+        if (!categories || categories.length === 0) {
+          categories = [{ category: "No Data", total: 1 }];
         }
 
-        function createCategoryChart(categories) {
-            const ctx = document.getElementById('category-chart').getContext('2d');
-            
-            if (!categories || categories.length === 0) {
-                categories = [{ category: 'No Data', total: 1 }];
-            }
-            
-            const colors = ['#38bdf8', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#fb7185'];
-            
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: categories.map(c => c.category),
-                    datasets: [{
-                        data: categories.map(c => c.total || 0),
-                        backgroundColor: colors,
-                        borderWidth: 0,
-                        cutout: '60%'
-                    }]
+        const colors = [
+          "#38bdf8",
+          "#34d399",
+          "#fbbf24",
+          "#f87171",
+          "#a78bfa",
+          "#fb7185",
+        ];
+
+        new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: categories.map((c) => c.category),
+            datasets: [
+              {
+                data: categories.map((c) => c.total || 0),
+                backgroundColor: colors,
+                borderWidth: 0,
+                cutout: "60%",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "right",
+                labels: {
+                  color: "#f1f5f9",
+                  font: { size: 11 },
+                  padding: 15,
+                  usePointStyle: true,
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { 
-                                color: '#f1f5f9',
-                                font: { size: 11 },
-                                padding: 15,
-                                usePointStyle: true
-                            }
-                        }
-                    }
-                }
-            });
+              },
+            },
+          },
+        });
+      }
+
+      function createDailyPatternChart(dailyPattern) {
+        const ctx = document
+          .getElementById("daily-pattern-chart")
+          .getContext("2d");
+
+        if (!dailyPattern || dailyPattern.length === 0) {
+          dailyPattern = [
+            { day: "Mon", average: 0 },
+            { day: "Tue", average: 0 },
+            { day: "Wed", average: 0 },
+            { day: "Thu", average: 0 },
+            { day: "Fri", average: 0 },
+            { day: "Sat", average: 0 },
+            { day: "Sun", average: 0 },
+          ];
         }
 
-        function createDailyPatternChart(dailyPattern) {
-            const ctx = document.getElementById('daily-pattern-chart').getContext('2d');
-            
-            if (!dailyPattern || dailyPattern.length === 0) {
-                dailyPattern = [
-                    { day: 'Mon', average: 0 }, { day: 'Tue', average: 0 },
-                    { day: 'Wed', average: 0 }, { day: 'Thu', average: 0 },
-                    { day: 'Fri', average: 0 }, { day: 'Sat', average: 0 }, { day: 'Sun', average: 0 }
-                ];
-            }
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: dailyPattern.map(d => d.day),
-                    datasets: [{
-                        label: 'Avg Spending',
-                        data: dailyPattern.map(d => d.average || 0),
-                        backgroundColor: '#38bdf8',
-                        borderRadius: 6,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: { 
-                            ticks: { color: '#94a3b8', font: { size: 11 } },
-                            grid: { display: false }
-                        },
-                        y: { 
-                            ticks: { color: '#94a3b8', font: { size: 11 } },
-                            grid: { color: '#1E293B' }
-                        }
-                    }
-                }
-            });
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: dailyPattern.map((d) => d.day),
+            datasets: [
+              {
+                label: "Avg Spending",
+                data: dailyPattern.map((d) => d.average || 0),
+                backgroundColor: "#38bdf8",
+                borderRadius: 6,
+                borderSkipped: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              x: {
+                ticks: { color: "#94a3b8", font: { size: 11 } },
+                grid: { display: false },
+              },
+              y: {
+                ticks: { color: "#94a3b8", font: { size: 11 } },
+                grid: { color: "#1E293B" },
+              },
+            },
+          },
+        });
+      }
+
+      function generateInsights(data) {
+        const insights = [];
+
+        // Savings rate insight
+        if (data.health_metrics.savings_rate > 20) {
+          insights.push({
+            type: "success",
+            icon: "trending_up",
+            text: `Excellent! You're saving ${Math.round(
+              data.health_metrics.savings_rate
+            )}% of your income. Keep up the great work!`,
+          });
+        } else if (data.health_metrics.savings_rate > 10) {
+          insights.push({
+            type: "warning",
+            icon: "savings",
+            text: `Good start! Try to increase your savings rate from ${Math.round(
+              data.health_metrics.savings_rate
+            )}% to 20% for better financial health.`,
+          });
+        } else {
+          insights.push({
+            type: "danger",
+            icon: "warning",
+            text: `Your savings rate is ${Math.round(
+              data.health_metrics.savings_rate
+            )}%. Consider reducing expenses or increasing income to save more.`,
+          });
         }
 
-        function generateInsights(data) {
-            const insights = [];
-            
-            // Savings rate insight
-            if (data.health_metrics.savings_rate > 20) {
-                insights.push({
-                    type: 'success',
-                    icon: 'trending_up',
-                    text: `Excellent! You're saving ${Math.round(data.health_metrics.savings_rate)}% of your income. Keep up the great work!`
-                });
-            } else if (data.health_metrics.savings_rate > 10) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'savings',
-                    text: `Good start! Try to increase your savings rate from ${Math.round(data.health_metrics.savings_rate)}% to 20% for better financial health.`
-                });
-            } else {
-                insights.push({
-                    type: 'danger',
-                    icon: 'warning',
-                    text: `Your savings rate is ${Math.round(data.health_metrics.savings_rate)}%. Consider reducing expenses or increasing income to save more.`
-                });
-            }
+        // Spending pattern insight
+        if (data.spending_patterns.peak_spending_day) {
+          insights.push({
+            type: "info",
+            icon: "calendar_today",
+            text: `You tend to spend most on ${data.spending_patterns.peak_spending_day}s. Consider planning purchases to avoid impulse spending.`,
+          });
+        }
 
-            // Spending pattern insight
-            if (data.spending_patterns.peak_spending_day) {
-                insights.push({
-                    type: 'info',
-                    icon: 'calendar_today',
-                    text: `You tend to spend most on ${data.spending_patterns.peak_spending_day}s. Consider planning purchases to avoid impulse spending.`
-                });
-            }
+        // Goals insight
+        if (data.goals_analysis.completion_rate > 50) {
+          insights.push({
+            type: "success",
+            icon: "flag",
+            text: `Great progress! You've completed ${data.goals_analysis.completion_rate}% of your financial goals.`,
+          });
+        } else if (data.goals_analysis.total_goals === 0) {
+          insights.push({
+            type: "info",
+            icon: "add_circle",
+            text: `Set some financial goals to stay motivated and track your progress towards financial freedom.`,
+          });
+        }
 
-            // Goals insight
-            if (data.goals_analysis.completion_rate > 50) {
-                insights.push({
-                    type: 'success',
-                    icon: 'flag',
-                    text: `Great progress! You've completed ${data.goals_analysis.completion_rate}% of your financial goals.`
-                });
-            } else if (data.goals_analysis.total_goals === 0) {
-                insights.push({
-                    type: 'info',
-                    icon: 'add_circle',
-                    text: `Set some financial goals to stay motivated and track your progress towards financial freedom.`
-                });
-            }
+        // Render insights
+        const container = $("#insights-list");
+        container.empty();
 
-            // Render insights
-            const container = $('#insights-list');
-            container.empty();
-            
-            insights.forEach(insight => {
-                const colorClass = {
-                    'success': 'text-success border-success/20 bg-success/10',
-                    'warning': 'text-warning border-warning/20 bg-warning/10',
-                    'danger': 'text-danger border-danger/20 bg-danger/10',
-                    'info': 'text-primary border-primary/20 bg-primary/10'
-                }[insight.type];
+        insights.forEach((insight) => {
+          const colorClass = {
+            success: "text-success border-success/20 bg-success/10",
+            warning: "text-warning border-warning/20 bg-warning/10",
+            danger: "text-danger border-danger/20 bg-danger/10",
+            info: "text-primary border-primary/20 bg-primary/10",
+          }[insight.type];
 
-                container.append(`
+          container.append(`
                     <div class="flex items-start gap-3 p-4 rounded-xl border ${colorClass}">
                         <span class="material-icons-round text-xl">${insight.icon}</span>
                         <p class="text-sm">${insight.text}</p>
                     </div>
                 `);
-            });
-        }
+        });
+      }
     </script>
-</body>
+  </body>
 </html>

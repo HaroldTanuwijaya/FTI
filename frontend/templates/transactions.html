@@ -1,380 +1,534 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Transaction History - FTI</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Round"
+      rel="stylesheet"
+    />
     <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#38bdf8",
-                        secondary: "#94a3b8",
-                        success: "#34d399",
-                        warning: "#fbbf24",
-                        danger: "#f87171",
-                        "background-dark": "#0B1120",
-                        "surface-dark": "#151F32",
-                        "surface-dark-hover": "#1E293B",
-                        "border-dark": "#1E293B",
-                        "text-main": "#f1f5f9",
-                        "text-muted": "#94a3b8",
-                    },
-                    fontFamily: {
-                        sans: ["Inter", "sans-serif"],
-                    },
-                },
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#38bdf8",
+              secondary: "#94a3b8",
+              success: "#34d399",
+              warning: "#fbbf24",
+              danger: "#f87171",
+              "background-dark": "#0B1120",
+              "surface-dark": "#151F32",
+              "surface-dark-hover": "#1E293B",
+              "border-dark": "#1E293B",
+              "text-main": "#f1f5f9",
+              "text-muted": "#94a3b8",
             },
-        };
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
     </script>
-</head>
-<body class="bg-background-dark text-text-main font-sans">
+  </head>
+  <body class="bg-background-dark text-text-main font-sans">
     <!-- Navigation -->
-    <nav class="sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="bg-primary/20 p-1.5 rounded-lg">
-                    <span class="material-icons-round text-primary text-xl">savings</span>
-                </div>
-                <span class="text-white font-bold text-2xl tracking-tight">FTI</span>
-                <span class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block">Financial Intelligence</span>
-            </div>
-            <div class="hidden md:flex items-center gap-8">
-                <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/">Dashboard</a>
-                <a class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5" href="/transactions">Transactions</a>
-                <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/analytics">Analytics</a>
-                <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/goals">Goals</a>
-            </div>
-            <div class="flex items-center gap-2">
-                <select id="currency-selector" class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer">
-                    <option value="USD">$ USD</option>
-                    <option value="EUR">€ EUR</option>
-                    <option value="GBP">£ GBP</option>
-                    <option value="JPY">¥ JPY</option>
-                    <option value="IDR">Rp IDR</option>
-                </select>
-                <div class="relative hidden sm:block">
-                    <button id="notification-btn" class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
-                        <span class="material-icons-round text-xl">notifications</span>
-                        <span id="notification-badge" class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"></span>
-                    </button>
-                    <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden">
-                        <div class="p-4 border-b border-border-dark flex items-center justify-between">
-                            <h3 class="font-semibold text-white">Notifications</h3>
-                            <button id="mark-all-read" class="text-xs text-primary hover:text-white">Mark all read</button>
-                        </div>
-                        <div id="notification-list" class="overflow-y-auto max-h-80">
-                            <div class="p-8 text-center text-text-muted">
-                                <span class="material-icons-round text-4xl mb-2 opacity-50">notifications_none</span>
-                                <p>No notifications</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 pl-4 border-l border-border-dark">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-xs font-semibold text-white" id="user-name">User</p>
-                        <p class="text-[10px] text-text-muted uppercase">Member</p>
-                    </div>
-                    <button id="logout-btn" class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all" title="Logout">
-                        <span class="material-icons-round text-sm">logout</span>
-                    </button>
-                </div>
-                <button id="mobile-menu-btn" class="md:hidden text-text-muted hover:text-white transition-colors p-2">
-                    <span class="material-icons-round text-xl">menu</span>
-                </button>
-            </div>
+    <nav
+      class="sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 py-4"
+    >
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="bg-primary/20 p-1.5 rounded-lg">
+            <span class="material-icons-round text-primary text-xl"
+              >savings</span
+            >
+          </div>
+          <span class="text-white font-bold text-2xl tracking-tight">FTI</span>
+          <span
+            class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block"
+            >Financial Intelligence</span
+          >
         </div>
+        <div class="hidden md:flex items-center gap-8">
+          <a
+            class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+            href="/"
+            >Dashboard</a
+          >
+          <a
+            class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5"
+            href="/transactions"
+            >Transactions</a
+          >
+          <!-- <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/analytics">Analytics</a> -->
+          <a
+            class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+            href="/goals"
+            >Goals</a
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <select
+            id="currency-selector"
+            class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer"
+          >
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+            <option value="GBP">£ GBP</option>
+            <option value="JPY">¥ JPY</option>
+            <option value="IDR">Rp IDR</option>
+          </select>
+          <div class="relative hidden sm:block">
+            <button
+              id="notification-btn"
+              class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5"
+            >
+              <span class="material-icons-round text-xl">notifications</span>
+              <span
+                id="notification-badge"
+                class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"
+              ></span>
+            </button>
+            <div
+              id="notification-dropdown"
+              class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden"
+            >
+              <div
+                class="p-4 border-b border-border-dark flex items-center justify-between"
+              >
+                <h3 class="font-semibold text-white">Notifications</h3>
+                <button
+                  id="mark-all-read"
+                  class="text-xs text-primary hover:text-white"
+                >
+                  Mark all read
+                </button>
+              </div>
+              <div id="notification-list" class="overflow-y-auto max-h-80">
+                <div class="p-8 text-center text-text-muted">
+                  <span class="material-icons-round text-4xl mb-2 opacity-50"
+                    >notifications_none</span
+                  >
+                  <p>No notifications</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 pl-4 border-l border-border-dark">
+            <div class="text-right hidden sm:block">
+              <p class="text-xs font-semibold text-white" id="user-name">
+                User
+              </p>
+              <p class="text-[10px] text-text-muted uppercase">Member</p>
+            </div>
+            <button
+              id="logout-btn"
+              class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all"
+              title="Logout"
+            >
+              <span class="material-icons-round text-sm">logout</span>
+            </button>
+          </div>
+          <button
+            id="mobile-menu-btn"
+            class="md:hidden text-text-muted hover:text-white transition-colors p-2"
+          >
+            <span class="material-icons-round text-xl">menu</span>
+          </button>
+        </div>
+      </div>
     </nav>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-surface-dark border-b border-border-dark">
-        <div class="px-4 py-3 space-y-3">
-            <a href="/" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
-                <span class="material-icons-round text-sm">dashboard</span>
-                <span>Dashboard</span>
-            </a>
-            <a href="/transactions" class="flex items-center gap-3 text-primary font-medium py-2">
-                <span class="material-icons-round text-sm">receipt_long</span>
-                <span>Transactions</span>
-            </a>
-            <a href="/analytics" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
-                <span class="material-icons-round text-sm">analytics</span>
-                <span>Analytics</span>
-            </a>
-            <a href="/goals" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
-                <span class="material-icons-round text-sm">flag</span>
-                <span>Goals</span>
-            </a>
-            <div class="pt-2 border-t border-border-dark">
-                <label class="block text-xs text-text-muted mb-2">Currency</label>
-                <select id="currency-selector-mobile" class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg">
-                    <option value="USD">$ USD</option>
-                    <option value="EUR">€ EUR</option>
-                    <option value="GBP">£ GBP</option>
-                    <option value="JPY">¥ JPY</option>
-                    <option value="IDR">Rp IDR</option>
-                </select>
-            </div>
+    <div
+      id="mobile-menu"
+      class="hidden md:hidden bg-surface-dark border-b border-border-dark"
+    >
+      <div class="px-4 py-3 space-y-3">
+        <a
+          href="/"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a
+          href="/transactions"
+          class="flex items-center gap-3 text-primary font-medium py-2"
+        >
+          <span class="material-icons-round text-sm">receipt_long</span>
+          <span>Transactions</span>
+        </a>
+        <a
+          href="/analytics"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">analytics</span>
+          <span>Analytics</span>
+        </a>
+        <a
+          href="/goals"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">flag</span>
+          <span>Goals</span>
+        </a>
+        <div class="pt-2 border-t border-border-dark">
+          <label class="block text-xs text-text-muted mb-2">Currency</label>
+          <select
+            id="currency-selector-mobile"
+            class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg"
+          >
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
+            <option value="GBP">£ GBP</option>
+            <option value="JPY">¥ JPY</option>
+            <option value="IDR">Rp IDR</option>
+          </select>
         </div>
+      </div>
     </div>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-6 py-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-text-main mb-2">Transaction History</h1>
-            <p class="text-text-muted">View and manage all your financial transactions</p>
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-text-main mb-2">
+          Transaction History
+        </h1>
+        <p class="text-text-muted">
+          View and manage all your financial transactions
+        </p>
+      </div>
+
+      <!-- Filters & Controls -->
+      <div
+        class="bg-surface-dark rounded-2xl border border-border-dark p-6 mb-6"
+      >
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Type Filter -->
+          <div>
+            <label class="block text-sm font-medium text-text-main mb-2"
+              >Type</label
+            >
+            <select
+              id="type-filter"
+              class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main"
+            >
+              <option value="">All Types</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+
+          <!-- Category Filter -->
+          <div>
+            <label class="block text-sm font-medium text-text-main mb-2"
+              >Category</label
+            >
+            <select
+              id="category-filter"
+              class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main"
+            >
+              <option value="">All Categories</option>
+            </select>
+          </div>
+
+          <!-- Sort By -->
+          <div>
+            <label class="block text-sm font-medium text-text-main mb-2"
+              >Sort By</label
+            >
+            <select
+              id="sort-by"
+              class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main"
+            >
+              <option value="date">Date</option>
+              <option value="amount">Amount</option>
+              <option value="category">Category</option>
+              <option value="type">Type</option>
+            </select>
+          </div>
+
+          <!-- Sort Order -->
+          <div>
+            <label class="block text-sm font-medium text-text-main mb-2"
+              >Order</label
+            >
+            <select
+              id="sort-order"
+              class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main"
+            >
+              <option value="desc">Newest First</option>
+              <option value="asc">Oldest First</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions Table -->
+      <div
+        class="bg-surface-dark rounded-2xl border border-border-dark overflow-hidden"
+      >
+        <!-- Table Header -->
+        <div class="px-6 py-4 border-b border-border-dark">
+          <h2 class="text-lg font-semibold text-text-main">Transactions</h2>
         </div>
 
-        <!-- Filters & Controls -->
-        <div class="bg-surface-dark rounded-2xl border border-border-dark p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <!-- Type Filter -->
-                <div>
-                    <label class="block text-sm font-medium text-text-main mb-2">Type</label>
-                    <select id="type-filter" class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main">
-                        <option value="">All Types</option>
-                        <option value="income">Income</option>
-                        <option value="expense">Expense</option>
-                    </select>
-                </div>
-
-                <!-- Category Filter -->
-                <div>
-                    <label class="block text-sm font-medium text-text-main mb-2">Category</label>
-                    <select id="category-filter" class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main">
-                        <option value="">All Categories</option>
-                    </select>
-                </div>
-
-                <!-- Sort By -->
-                <div>
-                    <label class="block text-sm font-medium text-text-main mb-2">Sort By</label>
-                    <select id="sort-by" class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main">
-                        <option value="date">Date</option>
-                        <option value="amount">Amount</option>
-                        <option value="category">Category</option>
-                        <option value="type">Type</option>
-                    </select>
-                </div>
-
-                <!-- Sort Order -->
-                <div>
-                    <label class="block text-sm font-medium text-text-main mb-2">Order</label>
-                    <select id="sort-order" class="w-full px-3 py-2 bg-background-dark border border-border-dark rounded-lg text-text-main">
-                        <option value="desc">Newest First</option>
-                        <option value="asc">Oldest First</option>
-                    </select>
-                </div>
-            </div>
+        <!-- Loading State -->
+        <div id="loading" class="p-8 text-center">
+          <span class="material-icons-round animate-spin text-primary text-2xl"
+            >refresh</span
+          >
+          <p class="text-text-muted mt-2">Loading transactions...</p>
         </div>
 
-        <!-- Transactions Table -->
-        <div class="bg-surface-dark rounded-2xl border border-border-dark overflow-hidden">
-            <!-- Table Header -->
-            <div class="px-6 py-4 border-b border-border-dark">
-                <h2 class="text-lg font-semibold text-text-main">Transactions</h2>
-            </div>
-
-            <!-- Loading State -->
-            <div id="loading" class="p-8 text-center">
-                <span class="material-icons-round animate-spin text-primary text-2xl">refresh</span>
-                <p class="text-text-muted mt-2">Loading transactions...</p>
-            </div>
-
-            <!-- Table Content -->
-            <div id="transactions-container" class="hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-background-dark">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Description</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Category</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">Type</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-text-muted uppercase tracking-wider">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactions-tbody" class="divide-y divide-border-dark">
-                            <!-- Transactions will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div id="empty-state" class="hidden p-8 text-center">
-                <span class="material-icons-round text-text-muted text-4xl mb-4">receipt_long</span>
-                <p class="text-text-muted">No transactions found</p>
-            </div>
+        <!-- Table Content -->
+        <div id="transactions-container" class="hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-background-dark">
+                <tr>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider"
+                  >
+                    Date
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider"
+                  >
+                    Description
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider"
+                  >
+                    Category
+                  </th>
+                  <th
+                    class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider"
+                  >
+                    Type
+                  </th>
+                  <th
+                    class="px-6 py-3 text-right text-xs font-medium text-text-muted uppercase tracking-wider"
+                  >
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                id="transactions-tbody"
+                class="divide-y divide-border-dark"
+              >
+                <!-- Transactions will be loaded here -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <!-- Pagination -->
-        <div id="pagination" class="mt-6 flex items-center justify-between">
-            <div class="text-sm text-text-muted">
-                Showing <span id="showing-from">0</span> to <span id="showing-to">0</span> of <span id="total-items">0</span> transactions
-            </div>
-            <div class="flex space-x-2">
-                <button id="prev-page" class="px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-text-muted hover:text-primary disabled:opacity-50">
-                    <span class="material-icons-round text-sm">chevron_left</span>
-                </button>
-                <span id="page-info" class="px-4 py-2 text-text-main">Page 1 of 1</span>
-                <button id="next-page" class="px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-text-muted hover:text-primary disabled:opacity-50">
-                    <span class="material-icons-round text-sm">chevron_right</span>
-                </button>
-            </div>
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden p-8 text-center">
+          <span class="material-icons-round text-text-muted text-4xl mb-4"
+            >receipt_long</span
+          >
+          <p class="text-text-muted">No transactions found</p>
         </div>
+      </div>
+
+      <!-- Pagination -->
+      <div id="pagination" class="mt-6 flex items-center justify-between">
+        <div class="text-sm text-text-muted">
+          Showing <span id="showing-from">0</span> to
+          <span id="showing-to">0</span> of
+          <span id="total-items">0</span> transactions
+        </div>
+        <div class="flex space-x-2">
+          <button
+            id="prev-page"
+            class="px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-text-muted hover:text-primary disabled:opacity-50"
+          >
+            <span class="material-icons-round text-sm">chevron_left</span>
+          </button>
+          <span id="page-info" class="px-4 py-2 text-text-main"
+            >Page 1 of 1</span
+          >
+          <button
+            id="next-page"
+            class="px-3 py-2 bg-surface-dark border border-border-dark rounded-lg text-text-muted hover:text-primary disabled:opacity-50"
+          >
+            <span class="material-icons-round text-sm">chevron_right</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <script>
-        let currentPage = 1;
-        let totalPages = 1;
-        const itemsPerPage = 20;
+      let currentPage = 1;
+      let totalPages = 1;
+      const itemsPerPage = 20;
 
-        $(document).ready(function() {
-            // Check authentication
-            const token = localStorage.getItem('fti_token');
-            if (!token) {
-                window.location.href = '/login';
-                return;
+      $(document).ready(function () {
+        // Check authentication
+        const token = localStorage.getItem("fti_token");
+        if (!token) {
+          window.location.href = "/login";
+          return;
+        }
+
+        // Setup AJAX defaults
+        $.ajaxSetup({
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+          },
+          error: function (xhr) {
+            if (xhr.status === 401) {
+              localStorage.removeItem("fti_token");
+              window.location.href = "/login";
             }
-
-            // Setup AJAX defaults
-            $.ajaxSetup({
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
-                },
-                error: function(xhr) {
-                    if (xhr.status === 401) {
-                        localStorage.removeItem('fti_token');
-                        window.location.href = '/login';
-                    }
-                }
-            });
-
-            // Load categories for filter
-            loadCategories();
-            
-            // Load initial transactions
-            loadTransactions();
-
-            // Event listeners
-            $('#type-filter, #category-filter, #sort-by, #sort-order').change(function() {
-                currentPage = 1;
-                loadTransactions();
-            });
-
-            $('#prev-page').click(function() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    loadTransactions();
-                }
-            });
-
-            $('#next-page').click(function() {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    loadTransactions();
-                }
-            });
-
-            // Navbar functionality
-            $('#logout-btn').click(function() {
-                localStorage.removeItem('fti_token');
-                window.location.href = '/login';
-            });
-
-            $('#mobile-menu-btn').click(function() {
-                $('#mobile-menu').toggleClass('hidden');
-            });
-
-            $('#notification-btn').click(function() {
-                $('#notification-dropdown').toggleClass('hidden');
-            });
-
-            // Close dropdowns when clicking outside
-            $(document).click(function(e) {
-                if (!$(e.target).closest('#notification-btn, #notification-dropdown').length) {
-                    $('#notification-dropdown').addClass('hidden');
-                }
-                if (!$(e.target).closest('#mobile-menu-btn, #mobile-menu').length) {
-                    $('#mobile-menu').addClass('hidden');
-                }
-            });
+          },
         });
 
-        function loadCategories() {
-            const categories = [
-                "Food & Dining", "Transportation", "Shopping", "Entertainment",
-                "Bills & Utilities", "Healthcare", "Education", "Travel",
-                "Income", "Investment", "Other"
-            ];
-            
-            const categorySelect = $('#category-filter');
-            categories.forEach(category => {
-                categorySelect.append(`<option value="${category}">${category}</option>`);
+        // Load categories for filter
+        loadCategories();
+
+        // Load initial transactions
+        loadTransactions();
+
+        // Event listeners
+        $("#type-filter, #category-filter, #sort-by, #sort-order").change(
+          function () {
+            currentPage = 1;
+            loadTransactions();
+          }
+        );
+
+        $("#prev-page").click(function () {
+          if (currentPage > 1) {
+            currentPage--;
+            loadTransactions();
+          }
+        });
+
+        $("#next-page").click(function () {
+          if (currentPage < totalPages) {
+            currentPage++;
+            loadTransactions();
+          }
+        });
+
+        // Navbar functionality
+        $("#logout-btn").click(function () {
+          localStorage.removeItem("fti_token");
+          window.location.href = "/login";
+        });
+
+        $("#mobile-menu-btn").click(function () {
+          $("#mobile-menu").toggleClass("hidden");
+        });
+
+        $("#notification-btn").click(function () {
+          $("#notification-dropdown").toggleClass("hidden");
+        });
+
+        // Close dropdowns when clicking outside
+        $(document).click(function (e) {
+          if (
+            !$(e.target).closest("#notification-btn, #notification-dropdown")
+              .length
+          ) {
+            $("#notification-dropdown").addClass("hidden");
+          }
+          if (!$(e.target).closest("#mobile-menu-btn, #mobile-menu").length) {
+            $("#mobile-menu").addClass("hidden");
+          }
+        });
+      });
+
+      function loadCategories() {
+        const categories = [
+          "Food & Dining",
+          "Transportation",
+          "Shopping",
+          "Entertainment",
+          "Bills & Utilities",
+          "Healthcare",
+          "Education",
+          "Travel",
+          "Income",
+          "Investment",
+          "Other",
+        ];
+
+        const categorySelect = $("#category-filter");
+        categories.forEach((category) => {
+          categorySelect.append(
+            `<option value="${category}">${category}</option>`
+          );
+        });
+      }
+
+      function loadTransactions() {
+        $("#loading").removeClass("hidden");
+        $("#transactions-container").addClass("hidden");
+        $("#empty-state").addClass("hidden");
+
+        const params = {
+          page: currentPage,
+          limit: itemsPerPage,
+          sort: $("#sort-by").val(),
+          order: $("#sort-order").val(),
+          type: $("#type-filter").val(),
+          category: $("#category-filter").val(),
+        };
+
+        $.get("/api/transactions/history", params)
+          .done(function (data) {
+            displayTransactions(data.transactions);
+            updatePagination(data.pagination);
+          })
+          .fail(function () {
+            Swal.fire({
+              title: "Error",
+              text: "Failed to load transactions",
+              icon: "error",
+              background: "#151F32",
+              color: "#f1f5f9",
+              confirmButtonColor: "#f87171",
             });
+          })
+          .always(function () {
+            $("#loading").addClass("hidden");
+          });
+      }
+
+      function displayTransactions(transactions) {
+        const tbody = $("#transactions-tbody");
+        tbody.empty();
+
+        if (transactions.length === 0) {
+          $("#empty-state").removeClass("hidden");
+          return;
         }
 
-        function loadTransactions() {
-            $('#loading').removeClass('hidden');
-            $('#transactions-container').addClass('hidden');
-            $('#empty-state').addClass('hidden');
+        $("#transactions-container").removeClass("hidden");
 
-            const params = {
-                page: currentPage,
-                limit: itemsPerPage,
-                sort: $('#sort-by').val(),
-                order: $('#sort-order').val(),
-                type: $('#type-filter').val(),
-                category: $('#category-filter').val()
-            };
+        transactions.forEach((transaction) => {
+          const typeColor =
+            transaction.type === "income" ? "text-success" : "text-danger";
+          const typeIcon = transaction.type === "income" ? "add" : "remove";
+          const amountPrefix = transaction.type === "income" ? "+" : "-";
 
-            $.get('/api/transactions/history', params)
-                .done(function(data) {
-                    displayTransactions(data.transactions);
-                    updatePagination(data.pagination);
-                })
-                .fail(function() {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'Failed to load transactions',
-                        icon: 'error',
-                        background: '#151F32',
-                        color: '#f1f5f9',
-                        confirmButtonColor: '#f87171'
-                    });
-                })
-                .always(function() {
-                    $('#loading').addClass('hidden');
-                });
-        }
-
-        function displayTransactions(transactions) {
-            const tbody = $('#transactions-tbody');
-            tbody.empty();
-
-            if (transactions.length === 0) {
-                $('#empty-state').removeClass('hidden');
-                return;
-            }
-
-            $('#transactions-container').removeClass('hidden');
-
-            transactions.forEach(transaction => {
-                const typeColor = transaction.type === 'income' ? 'text-success' : 'text-danger';
-                const typeIcon = transaction.type === 'income' ? 'add' : 'remove';
-                const amountPrefix = transaction.type === 'income' ? '+' : '-';
-                
-                const row = `
+          const row = `
                     <tr class="hover:bg-surface-dark-hover transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-text-main">
                             ${new Date(transaction.date).toLocaleDateString()}
@@ -386,32 +540,40 @@
                             ${transaction.category}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${transaction.type === 'income' ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'}">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              transaction.type === "income"
+                                ? "bg-success/20 text-success"
+                                : "bg-danger/20 text-danger"
+                            }">
                                 <span class="material-icons-round text-xs mr-1">${typeIcon}</span>
                                 ${transaction.type}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${typeColor}">
-                            ${amountPrefix}Rp${Math.abs(transaction.amount).toLocaleString()}
+                            ${amountPrefix}Rp${Math.abs(
+            transaction.amount
+          ).toLocaleString()}
                         </td>
                     </tr>
                 `;
-                tbody.append(row);
-            });
-        }
+          tbody.append(row);
+        });
+      }
 
-        function updatePagination(pagination) {
-            currentPage = pagination.current_page;
-            totalPages = pagination.total_pages;
+      function updatePagination(pagination) {
+        currentPage = pagination.current_page;
+        totalPages = pagination.total_pages;
 
-            $('#showing-from').text(((currentPage - 1) * itemsPerPage) + 1);
-            $('#showing-to').text(Math.min(currentPage * itemsPerPage, pagination.total_items));
-            $('#total-items').text(pagination.total_items);
-            $('#page-info').text(`Page ${currentPage} of ${totalPages}`);
+        $("#showing-from").text((currentPage - 1) * itemsPerPage + 1);
+        $("#showing-to").text(
+          Math.min(currentPage * itemsPerPage, pagination.total_items)
+        );
+        $("#total-items").text(pagination.total_items);
+        $("#page-info").text(`Page ${currentPage} of ${totalPages}`);
 
-            $('#prev-page').prop('disabled', currentPage <= 1);
-            $('#next-page').prop('disabled', currentPage >= totalPages);
-        }
+        $("#prev-page").prop("disabled", currentPage <= 1);
+        $("#next-page").prop("disabled", currentPage >= totalPages);
+      }
     </script>
-</body>
+  </body>
 </html>

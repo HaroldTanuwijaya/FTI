@@ -94,11 +94,11 @@
             href="/transactions"
             >Transactions</a
           >
-          <a
+          <!-- <a
             class="text-text-muted hover:text-white transition-colors font-medium text-sm"
             href="/analytics"
             >Analytics</a
-          >
+          > -->
           <a
             class="text-text-muted hover:text-white transition-colors font-medium text-sm"
             href="/goals"
@@ -312,8 +312,12 @@
             <p class="text-sm font-medium text-text-muted mb-1">
               Wallet Balance
             </p>
-            <p class="text-3xl font-bold text-white tracking-tight">
-              $0<span class="text-lg text-text-muted font-normal">.00</span>
+            <p
+              class="text-xl sm:text-2xl font-bold text-white tracking-tight whitespace-nowrap"
+            >
+              $0<span class="text-sm sm:text-base text-text-muted font-normal"
+                >.00</span
+              >
             </p>
           </div>
           <div
@@ -329,8 +333,13 @@
               >
             </div>
             <p class="text-sm font-medium text-text-muted mb-1">Total Income</p>
-            <p class="text-3xl font-bold text-white tracking-tight">
-              $8,500<span class="text-lg text-text-muted font-normal">.00</span>
+            <p
+              class="text-xl sm:text-2xl font-bold text-white tracking-tight whitespace-nowrap"
+            >
+              $8,500<span
+                class="text-sm sm:text-base text-text-muted font-normal"
+                >.00</span
+              >
             </p>
           </div>
           <div
@@ -348,8 +357,13 @@
             <p class="text-sm font-medium text-text-muted mb-1">
               Total Expenses
             </p>
-            <p class="text-3xl font-bold text-white tracking-tight">
-              $4,695<span class="text-lg text-text-muted font-normal">.50</span>
+            <p
+              class="text-xl sm:text-2xl font-bold text-white tracking-tight whitespace-nowrap"
+            >
+              $4,695<span
+                class="text-sm sm:text-base text-text-muted font-normal"
+                >.50</span
+              >
             </p>
           </div>
           <div
@@ -361,8 +375,13 @@
               </div>
             </div>
             <p class="text-sm font-medium text-text-muted mb-1">Net Flow</p>
-            <p class="text-3xl font-bold text-primary tracking-tight text-glow">
-              $3,805<span class="text-lg text-primary/70 font-normal">.50</span>
+            <p
+              class="text-xl sm:text-2xl font-bold text-primary tracking-tight text-glow whitespace-nowrap"
+            >
+              $3,805<span
+                class="text-sm sm:text-base text-primary/70 font-normal"
+                >.50</span
+              >
             </p>
           </div>
           <div
@@ -378,7 +397,11 @@
                 <p class="text-sm font-medium text-text-muted mb-1">
                   Budget Used
                 </p>
-                <p class="text-3xl font-bold text-white tracking-tight">100%</p>
+                <p
+                  class="text-xl sm:text-2xl font-bold text-white tracking-tight whitespace-nowrap"
+                >
+                  100%
+                </p>
               </div>
               <span
                 class="text-xs text-danger bg-danger/10 px-2 py-1 rounded font-medium mb-1"
@@ -1011,43 +1034,43 @@
           const walletColor = walletBalance >= 0 ? "text-white" : "text-danger";
           cards
             .eq(0)
-            .find(".text-3xl")
+            .find(".text-xl")
             .removeClass("text-white text-danger")
             .addClass(walletColor)
             .html(
-              `${symbol}${walletBalance.toLocaleString()}<span class="text-lg text-text-muted font-normal">.00</span>`
+              `${symbol}${walletBalance.toLocaleString()}<span class="text-sm sm:text-base text-text-muted font-normal">.00</span>`
             );
 
           // Income (1), Expenses (2), Net Flow (3)
           cards
             .eq(1)
-            .find(".text-3xl")
+            .find(".text-xl")
             .html(
               `${symbol}${(
                 data.monthly_income || 0
-              ).toLocaleString()}<span class="text-lg text-text-muted font-normal">.00</span>`
+              ).toLocaleString()}<span class="text-sm sm:text-base text-text-muted font-normal">.00</span>`
             );
           cards
             .eq(2)
-            .find(".text-3xl")
+            .find(".text-xl")
             .html(
               `${symbol}${(
                 data.monthly_expenses || 0
-              ).toLocaleString()}<span class="text-lg text-text-muted font-normal">.00</span>`
+              ).toLocaleString()}<span class="text-sm sm:text-base text-text-muted font-normal">.00</span>`
             );
           cards
             .eq(3)
-            .find(".text-3xl")
+            .find(".text-xl")
             .html(
               `${symbol}${(
                 data.net_flow || 0
-              ).toLocaleString()}<span class="text-lg text-primary/70 font-normal">.00</span>`
+              ).toLocaleString()}<span class="text-sm sm:text-base text-primary/70 font-normal">.00</span>`
             );
 
           // Update budget card (4)
           const budgetCard = cards.eq(4);
           const budgetUsed = data.budget_used || 0;
-          budgetCard.find(".text-3xl").first().text(`${budgetUsed}%`);
+          budgetCard.find(".text-xl").first().text(`${budgetUsed}%`);
           budgetCard
             .find(".h-2 > div")
             .css("width", `${Math.min(budgetUsed, 100)}%`);
