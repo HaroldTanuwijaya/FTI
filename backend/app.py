@@ -750,7 +750,7 @@ def get_goals(current_user_id):
                 "name": goal.get("name", ""),
                 "target_amount": goal.get("target_amount", 0),
                 "current_amount": goal.get("current_amount", 0),
-                "deadline": goal.get("deadline", ""),
+                "target_date": goal.get("target_date", ""),
                 "status": goal.get("status", "active")
             })
         
@@ -781,7 +781,7 @@ def create_goal(current_user_id):
             "name": data['name'],
             "target_amount": float(data['target_amount']),
             "current_amount": float(data.get('current_amount', 0)),
-            "deadline": data['deadline'],
+            "target_date": data['deadline'],
             "status": "active",
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow()
@@ -814,7 +814,7 @@ def get_goal(current_user_id, goal_id):
             "name": goal.get("name", ""),
             "target_amount": goal.get("target_amount", 0),
             "current_amount": goal.get("current_amount", 0),
-            "deadline": goal.get("deadline", ""),
+            "target_date": goal.get("target_date", ""),
             "status": goal.get("status", "active")
         })
     
@@ -839,7 +839,7 @@ def update_goal(current_user_id, goal_id):
         if 'target_amount' in data:
             update_data['target_amount'] = float(data['target_amount'])
         if 'deadline' in data:
-            update_data['deadline'] = data['deadline']
+            update_data['target_date'] = data['deadline']
         
         result = mongo.db.goals.update_one(
             {"_id": ObjectId(goal_id), "user_id": ObjectId(current_user_id)},
