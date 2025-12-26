@@ -750,7 +750,7 @@ def get_goals(current_user_id):
                 "name": goal.get("name", ""),
                 "target_amount": goal.get("target_amount", 0),
                 "current_amount": goal.get("current_amount", 0),
-                "target_date": goal.get("target_date", ""),
+                "deadline": goal.get("target_date", ""),
                 "status": goal.get("status", "active")
             })
         
@@ -814,7 +814,7 @@ def get_goal(current_user_id, goal_id):
             "name": goal.get("name", ""),
             "target_amount": goal.get("target_amount", 0),
             "current_amount": goal.get("current_amount", 0),
-            "target_date": goal.get("target_date", ""),
+            "deadline": goal.get("target_date", ""),
             "status": goal.get("status", "active")
         })
     
