@@ -1,62 +1,59 @@
 {% extends "base.html" %} {% block content %}
 <div class="min-h-screen bg-background-dark">
   <!-- Navbar -->
-  <nav class="bg-surface-dark border-b border-border-dark sticky top-0 z-40 backdrop-blur-sm bg-surface-dark/95">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center gap-3">
-          <div class="bg-primary/20 p-1.5 rounded-lg">
-            <span class="material-icons-round text-primary text-xl">savings</span>
-          </div>
-          <span class="text-white font-bold text-2xl tracking-tight">FTI</span>
-          <span class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block">Financial Intelligence</span>
+  <nav class="sticky top-0 z-30 bg-background-dark/80 backdrop-blur-md border-b border-border-dark px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="bg-primary/20 p-1.5 rounded-lg">
+          <span class="material-icons-round text-primary text-xl">savings</span>
         </div>
-        <div class="hidden md:flex items-center gap-8">
-          <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/">Dashboard</a>
-          <a class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5" href="/goals">Goals</a>
-        </div>
-        <div class="flex items-center gap-2">
-          <select id="currency-selector" class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer">
-            <option value="USD">$ USD</option>
-            <option value="EUR">€ EUR</option>
-            <option value="GBP">£ GBP</option>
-            <option value="JPY">¥ JPY</option>
-            <option value="IDR">Rp IDR</option>
-          </select>
-          <div class="relative hidden sm:block">
-            <button id="notification-btn" class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
-              <span class="material-icons-round text-xl">notifications</span>
-              <span id="notification-badge" class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"></span>
-            </button>
-            <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden">
-              <div class="p-4 border-b border-border-dark flex items-center justify-between">
-                <h3 class="font-semibold text-white">Notifications</h3>
-                <button id="mark-all-read" class="text-xs text-primary hover:text-white">Mark all read</button>
-              </div>
-              <div id="notification-list" class="overflow-y-auto max-h-80">
-                <div class="p-8 text-center text-text-muted">
-                  <span class="material-icons-round text-4xl mb-2 opacity-50">notifications_none</span>
-                  <p>No notifications</p>
-                </div>
+        <span class="text-white font-bold text-2xl tracking-tight">FTI</span>
+        <span class="text-text-muted font-medium border-l border-border-dark pl-3 ml-1 text-xs uppercase tracking-widest hidden sm:inline-block">Financial Intelligence</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8">
+        <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/">Dashboard</a>
+        <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/transactions">Transactions</a>
+        <a class="text-text-muted hover:text-white transition-colors font-medium text-sm" href="/analytics">Analytics</a>
+        <a class="text-primary font-medium text-sm border-b-2 border-primary pb-0.5" href="/goals">Goals</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <select id="currency-selector" class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer">
+          <option value="USD">$ USD</option>
+          <option value="EUR">€ EUR</option>
+          <option value="GBP">£ GBP</option>
+          <option value="JPY">¥ JPY</option>
+          <option value="IDR">Rp IDR</option>
+        </select>
+        <div class="relative hidden sm:block">
+          <button id="notification-btn" class="relative text-text-muted hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+            <span class="material-icons-round text-xl">notifications</span>
+            <span id="notification-badge" class="absolute top-2 right-2 h-2 w-2 bg-danger rounded-full ring-2 ring-background-dark hidden"></span>
+          </button>
+          <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-96 bg-surface-dark border border-border-dark rounded-xl shadow-card z-50 max-h-96 overflow-hidden">
+            <div class="p-4 border-b border-border-dark flex items-center justify-between">
+              <h3 class="font-semibold text-white">Notifications</h3>
+              <button id="mark-all-read" class="text-xs text-primary hover:text-white">Mark all read</button>
+            </div>
+            <div id="notification-list" class="overflow-y-auto max-h-80">
+              <div class="p-8 text-center text-text-muted">
+                <span class="material-icons-round text-4xl mb-2 opacity-50">notifications_none</span>
+                <p>No notifications</p>
               </div>
             </div>
           </div>
-          <div class="flex items-center gap-3 pl-4 border-l border-border-dark">
-            <div class="text-right hidden sm:block">
-              <p class="text-xs font-semibold text-white" id="user-name">User</p>
-              <p class="text-[10px] text-text-muted uppercase">Member</p>
-            </div>
-            <button id="logout-btn" class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all" title="Logout">
-              <span class="material-icons-round text-sm">logout</span>
-            </button>
+        </div>
+        <div class="flex items-center gap-3 pl-4 border-l border-border-dark">
+          <div class="text-right hidden sm:block">
+            <p class="text-xs font-semibold text-white" id="user-name">User</p>
+            <p class="text-[10px] text-text-muted uppercase">Member</p>
           </div>
-          <button
-            id="mobile-menu-btn"
-            class="md:hidden text-text-muted hover:text-white transition-colors p-2"
-          >
-            <span class="material-icons-round text-xl">menu</span>
+          <button id="logout-btn" class="h-9 w-9 rounded-full bg-gradient-to-tr from-primary to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-glow ring-2 ring-background-dark hover:ring-primary transition-all" title="Logout">
+            <span class="material-icons-round text-sm">logout</span>
           </button>
         </div>
+        <button id="mobile-menu-btn" class="md:hidden text-text-muted hover:text-white transition-colors p-2">
+          <span class="material-icons-round text-xl">menu</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -67,6 +64,14 @@
       <a href="/" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
         <span class="material-icons-round text-sm">dashboard</span>
         <span>Dashboard</span>
+      </a>
+      <a href="/transactions" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
+        <span class="material-icons-round text-sm">receipt_long</span>
+        <span>Transactions</span>
+      </a>
+      <a href="/analytics" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
+        <span class="material-icons-round text-sm">analytics</span>
+        <span>Analytics</span>
       </a>
       <a href="/goals" class="flex items-center gap-3 text-primary font-medium py-2">
         <span class="material-icons-round text-sm">flag</span>

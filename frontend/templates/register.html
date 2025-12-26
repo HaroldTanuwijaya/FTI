@@ -1,174 +1,299 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-fti-blue">
-                <span class="text-white font-bold text-xl">FTI</span>
-            </div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Create your account
-            </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
-                Or
-                <a href="/login" class="font-medium text-fti-blue hover:text-fti-blue-dark">
-                    sign in to existing account
-                </a>
-            </p>
-        </div>
-        
-        <form id="register-form" class="mt-8 space-y-6">
-            <div class="space-y-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input id="name" name="name" type="text" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-fti-blue focus:border-fti-blue sm:text-sm">
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                    <input id="email" name="email" type="email" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-fti-blue focus:border-fti-blue sm:text-sm">
-                </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                    <input id="password" name="password" type="password" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-fti-blue focus:border-fti-blue sm:text-sm">
-                </div>
-                <div>
-                    <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                    <input id="confirm-password" name="confirm-password" type="password" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-fti-blue focus:border-fti-blue sm:text-sm">
-                </div>
-            </div>
-
-            <div>
-                <button type="submit"
-                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-fti-blue hover:bg-fti-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-fti-blue">
-                    Create Account
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-$(document).ready(function() {
-    $('#register-form').submit(function(e) {
-        e.preventDefault();
-        
-        const name = $('#name').val().trim();
-        const email = $('#email').val().trim();
-        const password = $('#password').val();
-        const confirmPassword = $('#confirm-password').val();
-        
-        // Validation
-        if (!name || name.length < 2) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Name must be at least 2 characters',
-                confirmButtonColor: '#0ea5e9'
-            });
-            return;
-        }
-        
-        if (name.length > 100) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Name is too long (max 100 characters)',
-                confirmButtonColor: '#0ea5e9'
-            });
-            return;
-        }
-        
-        if (!email) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Email is required',
-                confirmButtonColor: '#0ea5e9'
-            });
-            return;
-        }
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Please enter a valid email address',
-                confirmButtonColor: '#0ea5e9'
-            });
-            return;
-        }
-        
-        if (!password || password.length < 6) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Password must be at least 6 characters',
-                confirmButtonColor: '#0ea5e9'
-            });
-            return;
-        }
-        
-        if (password.length > 128) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Password is too long (max 128 characters)',
-                confirmButtonColor: '#0ea5e9'
-            });
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Passwords do not match',
-                confirmButtonColor: '#0ea5e9'
-            });
-            return;
-        }
-        
-        const formData = {
-            name: name,
-            email: email,
-            password: password
-        };
-        
-        $.ajax({
-            url: '/api/auth/register',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(formData),
-            success: function(response) {
-                localStorage.setItem('fti_token', response.token);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Registration Successful!',
-                    text: 'Welcome to FTI',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = '/';
-                });
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FTI Register - Join Financial Intelligence</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#38bdf8",
+                        secondary: "#94a3b8",
+                        success: "#34d399",
+                        warning: "#fbbf24",
+                        danger: "#f87171",
+                        "background-dark": "#0B1120",
+                        "surface-dark": "#151F32",
+                        "surface-dark-hover": "#1E293B",
+                        "border-dark": "#1E293B",
+                        "text-main": "#f1f5f9",
+                        "text-muted": "#94a3b8",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    boxShadow: {
+                        glow: "0 0 15px rgba(56, 189, 248, 0.15)",
+                        card: "0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.1)",
+                    },
+                },
             },
-            error: function(xhr) {
-                const errorMsg = xhr.responseJSON?.error || 'Registration failed. Please try again.';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Registration Failed',
-                    text: errorMsg,
-                    confirmButtonColor: '#0ea5e9'
-                });
+        };
+    </script>
+</head>
+<body class="bg-background-dark text-text-main font-sans min-h-screen">
+    <!-- Background Pattern -->
+    <div class="fixed inset-0 bg-gradient-to-br from-background-dark via-surface-dark to-background-dark"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(56,189,248,0.1),transparent_50%)]"></div>
+    
+    <!-- Main Content -->
+    <div class="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+        <div class="max-w-md w-full">
+            <!-- Logo & Header -->
+            <div class="text-center mb-8">
+                <div class="mx-auto h-16 w-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-blue-600 shadow-glow mb-6">
+                    <span class="text-white font-bold text-2xl">FTI</span>
+                </div>
+                <h1 class="text-3xl font-bold text-text-main mb-2">Join FTI</h1>
+                <p class="text-text-muted">Start your financial intelligence journey</p>
+            </div>
+
+            <!-- Register Form -->
+            <div class="bg-surface-dark rounded-2xl shadow-card border border-border-dark p-8">
+                <form id="register-form" class="space-y-6">
+                    <!-- Name Field -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-text-main mb-2">
+                            Full Name
+                        </label>
+                        <input 
+                            id="name" 
+                            name="name" 
+                            type="text" 
+                            required
+                            class="w-full px-4 py-3 bg-background-dark border border-border-dark rounded-xl text-text-main placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                            placeholder="Enter your full name"
+                        />
+                    </div>
+
+                    <!-- Email Field -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-text-main mb-2">
+                            Email Address
+                        </label>
+                        <input 
+                            id="email" 
+                            name="email" 
+                            type="email" 
+                            required
+                            class="w-full px-4 py-3 bg-background-dark border border-border-dark rounded-xl text-text-main placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                            placeholder="Enter your email"
+                        />
+                    </div>
+
+                    <!-- Password Field -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-text-main mb-2">
+                            Password
+                        </label>
+                        <input 
+                            id="password" 
+                            name="password" 
+                            type="password" 
+                            required
+                            class="w-full px-4 py-3 bg-background-dark border border-border-dark rounded-xl text-text-main placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                            placeholder="Create a strong password"
+                        />
+                        <p class="text-xs text-text-muted mt-1">Minimum 8 characters with letters and numbers</p>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-text-main mb-2">
+                            Confirm Password
+                        </label>
+                        <input 
+                            id="confirm-password" 
+                            name="confirm-password" 
+                            type="password" 
+                            required
+                            class="w-full px-4 py-3 bg-background-dark border border-border-dark rounded-xl text-text-main placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                            placeholder="Confirm your password"
+                        />
+                    </div>
+
+                    <!-- Terms & Conditions -->
+                    <div class="flex items-start">
+                        <input 
+                            id="terms" 
+                            name="terms" 
+                            type="checkbox"
+                            required
+                            class="h-4 w-4 text-primary focus:ring-primary border-border-dark rounded bg-background-dark mt-1"
+                        />
+                        <label for="terms" class="ml-3 text-sm text-text-muted">
+                            I agree to the 
+                            <a href="#" class="text-primary hover:text-blue-400 transition-colors">Terms of Service</a>
+                            and 
+                            <a href="#" class="text-primary hover:text-blue-400 transition-colors">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit"
+                        class="w-full bg-gradient-to-r from-primary to-blue-600 text-white font-semibold py-3 px-4 rounded-xl hover:from-blue-500 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-dark transition-all duration-200 shadow-glow"
+                    >
+                        <span class="flex items-center justify-center">
+                            <span class="material-icons-round mr-2 text-sm">person_add</span>
+                            Create Account
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="mt-6 pt-6 border-t border-border-dark">
+                    <p class="text-center text-text-muted">
+                        Already have an account?
+                        <a href="/login" class="text-primary hover:text-blue-400 font-medium transition-colors ml-1">
+                            Sign In
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="text-center mt-8">
+                <p class="text-text-muted text-sm">
+                    © 2024 FTI - Financial Tracking Intelligence
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Check if already logged in
+            const token = localStorage.getItem('fti_token');
+            if (token) {
+                window.location.href = '/';
+                return;
             }
+
+            $('#register-form').submit(function(e) {
+                e.preventDefault();
+                
+                const name = $('#name').val();
+                const email = $('#email').val();
+                const password = $('#password').val();
+                const confirmPassword = $('#confirm-password').val();
+                const terms = $('#terms').is(':checked');
+                
+                // Validation
+                if (!name || !email || !password || !confirmPassword) {
+                    Swal.fire({
+                        title: 'Missing Information',
+                        text: 'Please fill in all fields',
+                        icon: 'warning',
+                        background: '#151F32',
+                        color: '#f1f5f9',
+                        confirmButtonColor: '#38bdf8'
+                    });
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    Swal.fire({
+                        title: 'Password Mismatch',
+                        text: 'Passwords do not match',
+                        icon: 'error',
+                        background: '#151F32',
+                        color: '#f1f5f9',
+                        confirmButtonColor: '#f87171'
+                    });
+                    return;
+                }
+
+                if (password.length < 8) {
+                    Swal.fire({
+                        title: 'Weak Password',
+                        text: 'Password must be at least 8 characters long',
+                        icon: 'warning',
+                        background: '#151F32',
+                        color: '#f1f5f9',
+                        confirmButtonColor: '#38bdf8'
+                    });
+                    return;
+                }
+
+                if (!terms) {
+                    Swal.fire({
+                        title: 'Terms Required',
+                        text: 'Please accept the terms and conditions',
+                        icon: 'warning',
+                        background: '#151F32',
+                        color: '#f1f5f9',
+                        confirmButtonColor: '#38bdf8'
+                    });
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = $('button[type="submit"]');
+                const originalText = submitBtn.html();
+                submitBtn.html('<span class="material-icons-round animate-spin mr-2">refresh</span>Creating Account...');
+                submitBtn.prop('disabled', true);
+
+                $.ajax({
+                    url: '/api/auth/register',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name, email, password }),
+                    success: function(response) {
+                        localStorage.setItem('fti_token', response.token);
+                        
+                        Swal.fire({
+                            title: 'Welcome to FTI!',
+                            text: 'Account created successfully',
+                            icon: 'success',
+                            background: '#151F32',
+                            color: '#f1f5f9',
+                            confirmButtonColor: '#34d399',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '/';
+                        });
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON?.error || 'Registration failed';
+                        
+                        Swal.fire({
+                            title: 'Registration Failed',
+                            text: error,
+                            icon: 'error',
+                            background: '#151F32',
+                            color: '#f1f5f9',
+                            confirmButtonColor: '#f87171'
+                        });
+                        
+                        // Reset button
+                        submitBtn.html(originalText);
+                        submitBtn.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Real-time password validation
+            $('#password, #confirm-password').on('input', function() {
+                const password = $('#password').val();
+                const confirmPassword = $('#confirm-password').val();
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    $('#confirm-password').addClass('border-danger');
+                } else {
+                    $('#confirm-password').removeClass('border-danger');
+                }
+            });
         });
-    });
-});
-</script>
-{% endblock %}
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 flask==2.3.3
 flask-pymongo==2.3.0
-pymongo==4.5.0
+pymongo==4.6.1
 python-dotenv==1.0.0
 bcrypt==4.0.1
 pyjwt==2.8.0

@@ -91,12 +91,25 @@
           >
           <a
             class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+            href="/transactions"
+            >Transactions</a
+          >
+          <a
+            class="text-text-muted hover:text-white transition-colors font-medium text-sm"
+            href="/analytics"
+            >Analytics</a
+          >
+          <a
+            class="text-text-muted hover:text-white transition-colors font-medium text-sm"
             href="/goals"
             >Goals</a
           >
         </div>
         <div class="flex items-center gap-2">
-          <select id="currency-selector" class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer">
+          <select
+            id="currency-selector"
+            class="hidden sm:block bg-surface-dark border border-border-dark text-text-muted text-xs px-3 py-1.5 rounded-lg hover:text-white transition-colors cursor-pointer"
+          >
             <option value="USD">$ USD</option>
             <option value="EUR">€ EUR</option>
             <option value="GBP">£ GBP</option>
@@ -167,19 +180,45 @@
     </nav>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-surface-dark border-b border-border-dark">
+    <div
+      id="mobile-menu"
+      class="hidden md:hidden bg-surface-dark border-b border-border-dark"
+    >
       <div class="px-4 py-3 space-y-3">
-        <a href="/" class="flex items-center gap-3 text-primary font-medium py-2">
+        <a
+          href="/"
+          class="flex items-center gap-3 text-primary font-medium py-2"
+        >
           <span class="material-icons-round text-sm">dashboard</span>
           <span>Dashboard</span>
         </a>
-        <a href="/goals" class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2">
+        <a
+          href="/transactions"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">receipt_long</span>
+          <span>Transactions</span>
+        </a>
+        <a
+          href="/analytics"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
+          <span class="material-icons-round text-sm">analytics</span>
+          <span>Analytics</span>
+        </a>
+        <a
+          href="/goals"
+          class="flex items-center gap-3 text-text-muted hover:text-white transition-colors py-2"
+        >
           <span class="material-icons-round text-sm">flag</span>
           <span>Goals</span>
         </a>
         <div class="pt-2 border-t border-border-dark">
           <label class="block text-xs text-text-muted mb-2">Currency</label>
-          <select id="currency-selector-mobile" class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg">
+          <select
+            id="currency-selector-mobile"
+            class="w-full bg-background-dark border border-border-dark text-white text-sm px-3 py-2 rounded-lg"
+          >
             <option value="USD">$ USD</option>
             <option value="EUR">€ EUR</option>
             <option value="GBP">£ GBP</option>
@@ -209,18 +248,48 @@
                 id="period-selector-btn"
                 class="flex items-center gap-2 bg-surface-dark border border-border-dark text-text-muted px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-dark-hover hover:text-white transition-all shadow-sm"
               >
-                <span class="material-icons-round text-base">calendar_today</span>
+                <span class="material-icons-round text-base"
+                  >calendar_today</span
+                >
                 <span id="period-label">This Month</span>
                 <span class="material-icons-round text-base">expand_more</span>
               </button>
-              
+
               <!-- Period Dropdown -->
-              <div id="period-dropdown" class="hidden absolute left-0 mt-2 w-48 bg-surface-dark border border-border-dark rounded-lg shadow-card z-50">
-                <button data-period="today" class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors">Today</button>
-                <button data-period="week" class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors">This Week</button>
-                <button data-period="month" class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors">This Month</button>
-                <button data-period="year" class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors">This Year</button>
-                <button data-period="all" class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors">All Time</button>
+              <div
+                id="period-dropdown"
+                class="hidden absolute left-0 mt-2 w-48 bg-surface-dark border border-border-dark rounded-lg shadow-card z-50"
+              >
+                <button
+                  data-period="today"
+                  class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors"
+                >
+                  Today
+                </button>
+                <button
+                  data-period="week"
+                  class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors"
+                >
+                  This Week
+                </button>
+                <button
+                  data-period="month"
+                  class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors"
+                >
+                  This Month
+                </button>
+                <button
+                  data-period="year"
+                  class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors"
+                >
+                  This Year
+                </button>
+                <button
+                  data-period="all"
+                  class="w-full text-left px-4 py-2.5 text-sm text-text-muted hover:bg-surface-dark-hover hover:text-white transition-colors"
+                >
+                  All Time
+                </button>
               </div>
             </div>
             <button
@@ -402,13 +471,14 @@
                   <p
                     class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2"
                   >
-                    Recurring
+                    This Month
                   </p>
                   <p
                     class="text-2xl font-bold text-white group-hover:text-primary transition-colors"
                   >
                     1
                   </p>
+                  <p class="text-xs text-text-muted mt-1">Transactions</p>
                 </div>
               </div>
               <div
@@ -513,7 +583,7 @@
               <h3 class="font-bold text-lg text-white">Recent Transactions</h3>
               <a
                 class="text-primary text-sm font-medium hover:text-white transition-colors"
-                href="#"
+                href="/transactions"
                 >View All</a
               >
             </div>
@@ -715,10 +785,17 @@
     </main>
 
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div class="bg-surface-dark rounded-2xl p-8 border border-border-dark shadow-card">
+    <div
+      id="loading-overlay"
+      class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center"
+    >
+      <div
+        class="bg-surface-dark rounded-2xl p-8 border border-border-dark shadow-card"
+      >
         <div class="flex flex-col items-center gap-4">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"
+          ></div>
           <p class="text-white font-medium">Loading...</p>
         </div>
       </div>
@@ -746,52 +823,52 @@
     <script>
       // Global variables
       let spendingChart = null;
-      let currentCurrency = 'USD';
-      let currentPeriod = 'month';
+      let currentCurrency = "USD";
+      let currentPeriod = "month";
       let currencySymbols = {
-          'USD': '$',
-          'EUR': '€',
-          'GBP': '£',
-          'JPY': '¥',
-          'IDR': 'Rp'
+        USD: "$",
+        EUR: "€",
+        GBP: "£",
+        JPY: "¥",
+        IDR: "Rp",
       };
       let periodLabels = {
-          'today': 'Today',
-          'week': 'This Week',
-          'month': 'This Month',
-          'year': 'This Year',
-          'all': 'All Time'
+        today: "Today",
+        week: "This Week",
+        month: "This Month",
+        year: "This Year",
+        all: "All Time",
       };
-      
+
       // Loading & Error Handling
       function showLoading() {
-        $('#loading-overlay').removeClass('hidden');
+        $("#loading-overlay").removeClass("hidden");
       }
-      
+
       function hideLoading() {
-        $('#loading-overlay').addClass('hidden');
+        $("#loading-overlay").addClass("hidden");
       }
-      
+
       function showError(title, message) {
         hideLoading();
         Swal.fire({
-          icon: 'error',
-          title: title || 'Error',
-          text: message || 'Something went wrong. Please try again.',
-          confirmButtonColor: '#38bdf8'
+          icon: "error",
+          title: title || "Error",
+          text: message || "Something went wrong. Please try again.",
+          confirmButtonColor: "#38bdf8",
         });
       }
-      
+
       function showSuccess(title, message) {
         Swal.fire({
-          icon: 'success',
+          icon: "success",
           title: title,
           text: message,
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
       }
-      
+
       $(document).ready(function () {
         // Check authentication
         const token = localStorage.getItem("fti_token");
@@ -835,66 +912,75 @@
         $("#logout-btn").click(() => logout());
         $("#notification-btn").click(() => toggleNotifications());
         $("#mark-all-read").click(() => markAllRead());
-        $('#currency-selector').change(function() {
-            saveCurrency($(this).val());
+        $("#currency-selector").change(function () {
+          saveCurrency($(this).val());
         });
-        
+
         // Mobile menu toggle
-        $('#mobile-menu-btn').click(function() {
-          $('#mobile-menu').toggleClass('hidden');
+        $("#mobile-menu-btn").click(function () {
+          $("#mobile-menu").toggleClass("hidden");
         });
-        
+
         // Sync mobile currency selector
-        $('#currency-selector-mobile').change(function() {
+        $("#currency-selector-mobile").change(function () {
           const currency = $(this).val();
-          $('#currency-selector').val(currency);
+          $("#currency-selector").val(currency);
           saveCurrency(currency);
         });
-        
+
         // Period selector handlers
-        $('#period-selector-btn').click(function(e) {
-            e.stopPropagation();
-            $('#period-dropdown').toggleClass('hidden');
+        $("#period-selector-btn").click(function (e) {
+          e.stopPropagation();
+          $("#period-dropdown").toggleClass("hidden");
         });
-        
-        $('#period-dropdown button').click(function() {
-            const period = $(this).data('period');
-            currentPeriod = period;
-            $('#period-label').text(periodLabels[period]);
-            $('#period-dropdown').addClass('hidden');
-            loadDashboardData();
+
+        $("#period-dropdown button").click(function () {
+          const period = $(this).data("period");
+          currentPeriod = period;
+          $("#period-label").text(periodLabels[period]);
+          $("#period-dropdown").addClass("hidden");
+          loadDashboardData();
         });
-        
+
         // Close dropdowns when clicking outside
-        $(document).click(function(e) {
-            if (!$(e.target).closest('#period-selector-btn, #period-dropdown').length) {
-                $('#period-dropdown').addClass('hidden');
-            }
-            if (!$(e.target).closest('#mobile-menu-btn, #mobile-menu').length) {
-                $('#mobile-menu').addClass('hidden');
-            }
-            if (!$(e.target).closest("#notification-btn, #notification-dropdown").length) {
-                $("#notification-dropdown").addClass("hidden");
-            }
+        $(document).click(function (e) {
+          if (
+            !$(e.target).closest("#period-selector-btn, #period-dropdown")
+              .length
+          ) {
+            $("#period-dropdown").addClass("hidden");
+          }
+          if (!$(e.target).closest("#mobile-menu-btn, #mobile-menu").length) {
+            $("#mobile-menu").addClass("hidden");
+          }
+          if (
+            !$(e.target).closest("#notification-btn, #notification-dropdown")
+              .length
+          ) {
+            $("#notification-dropdown").addClass("hidden");
+          }
         });
 
         function loadDashboardData() {
           showLoading();
-          
+
           $.ajax({
             url: "/api/dashboard",
             method: "GET",
             data: { period: currentPeriod },
             success: function (data) {
               if (data.error) {
-                showError('Dashboard Error', data.error);
+                showError("Dashboard Error", data.error);
                 return;
               }
               updateDashboard(data);
               hideLoading();
             },
             error: function (xhr, status, error) {
-              showError('Failed to Load Dashboard', 'Unable to fetch dashboard data. Please refresh the page.');
+              showError(
+                "Failed to Load Dashboard",
+                "Unable to fetch dashboard data. Please refresh the page."
+              );
               console.error("Dashboard error:", error, xhr.responseText);
             },
           });
@@ -917,8 +1003,8 @@
           const cards = $(
             ".grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-5 > div"
           );
-          
-          const symbol = currencySymbols[currentCurrency] || '$';
+
+          const symbol = currencySymbols[currentCurrency] || "$";
 
           // Wallet Balance (0)
           const walletBalance = data.wallet_balance || 0;
@@ -1010,19 +1096,23 @@
           // Update monthly summary
           if (data.monthly_summary) {
             const summary = data.monthly_summary;
-            const symbol = currencySymbols[currentCurrency] || '$';
+            const symbol = currencySymbols[currentCurrency] || "$";
             $(".grid.grid-cols-2.sm\\:grid-cols-4 .text-2xl")
               .eq(0)
               .text(summary.transaction_count || 0);
             $(".grid.grid-cols-2.sm\\:grid-cols-4 .text-2xl")
               .eq(1)
-              .text(`${symbol}${Math.round(summary.daily_average || 0)}`);
+              .text(
+                `${symbol}${Math.round(
+                  summary.daily_average || 0
+                ).toLocaleString()}`
+              );
             $(".grid.grid-cols-2.sm\\:grid-cols-4 .text-xl").text(
               summary.top_category || "N/A"
             );
             $(".grid.grid-cols-2.sm\\:grid-cols-4 .text-2xl")
               .eq(3)
-              .text(summary.recurring_count || 0);
+              .text(summary.transaction_count || 0);
           }
 
           // Update recent transactions
@@ -1061,7 +1151,7 @@
         function renderTransactions(transactions) {
           const container = $(".flex-grow.p-4.space-y-2");
           let html = "";
-          const symbol = currencySymbols[currentCurrency] || '$';
+          const symbol = currencySymbols[currentCurrency] || "$";
 
           transactions.slice(0, 5).forEach((t) => {
             const isIncome = t.type === "income";
@@ -1129,8 +1219,8 @@
           if (spendingChart) {
             spendingChart.destroy();
           }
-          
-          const symbol = currencySymbols[currentCurrency] || '$';
+
+          const symbol = currencySymbols[currentCurrency] || "$";
 
           // Create new chart
           const ctx = document
@@ -1259,18 +1349,22 @@
               const amount = $("#t-amount").val();
               const category = $("#t-category").val();
               const date = $("#t-date").val();
-              
+
               // Validation
               if (!desc) {
                 Swal.showValidationMessage("Description is required");
                 return false;
               }
               if (desc.length < 3) {
-                Swal.showValidationMessage("Description must be at least 3 characters");
+                Swal.showValidationMessage(
+                  "Description must be at least 3 characters"
+                );
                 return false;
               }
               if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-                Swal.showValidationMessage("Please enter a valid amount greater than 0");
+                Swal.showValidationMessage(
+                  "Please enter a valid amount greater than 0"
+                );
                 return false;
               }
               if (parseFloat(amount) > 1000000000) {
@@ -1285,7 +1379,7 @@
                 Swal.showValidationMessage("Date is required");
                 return false;
               }
-              
+
               return {
                 description: desc,
                 amount: parseFloat(amount),
@@ -1303,7 +1397,7 @@
 
         function saveTransaction(data) {
           showLoading();
-          
+
           $.ajax({
             url: "/api/transactions",
             method: "POST",
@@ -1315,7 +1409,8 @@
               loadDashboardData();
             },
             error: function (xhr) {
-              const errorMsg = xhr.responseJSON?.error || "Failed to add transaction";
+              const errorMsg =
+                xhr.responseJSON?.error || "Failed to add transaction";
               showError("Transaction Error", errorMsg);
             },
           });
@@ -1337,9 +1432,11 @@
             confirmButtonColor: "#38bdf8",
             preConfirm: () => {
               const total = $("#b-total").val();
-              
+
               if (!total || isNaN(total)) {
-                Swal.showValidationMessage("Please enter a valid budget amount");
+                Swal.showValidationMessage(
+                  "Please enter a valid budget amount"
+                );
                 return false;
               }
               if (parseFloat(total) <= 0) {
@@ -1350,7 +1447,7 @@
                 Swal.showValidationMessage("Budget amount is too large");
                 return false;
               }
-              
+
               return { total_amount: parseFloat(total) };
             },
           }).then((result) => {
@@ -1362,7 +1459,7 @@
 
         function saveBudget(data) {
           showLoading();
-          
+
           $.ajax({
             url: "/api/budget",
             method: "POST",
@@ -1374,19 +1471,20 @@
               loadDashboardData();
             },
             error: function (xhr) {
-              const errorMsg = xhr.responseJSON?.error || "Failed to update budget";
+              const errorMsg =
+                xhr.responseJSON?.error || "Failed to update budget";
               showError("Budget Error", errorMsg);
             },
           });
         }
 
         function exportData() {
-          const token = localStorage.getItem('fti_token');
+          const token = localStorage.getItem("fti_token");
           window.location.href = "/api/export/csv?token=" + token;
         }
 
         function generateReport() {
-          const token = localStorage.getItem('fti_token');
+          const token = localStorage.getItem("fti_token");
           window.open("/api/reports/monthly?token=" + token, "_blank");
         }
 
@@ -1508,44 +1606,48 @@
             },
           });
         }
-        
+
         function loadCurrency() {
-            $.ajax({
-                url: '/api/settings/currency',
-                method: 'GET',
-                success: function(data) {
-                    currentCurrency = data.currency || 'USD';
-                    $('#currency-selector').val(currentCurrency);
-                    $('#currency-selector-mobile').val(currentCurrency);
-                },
-                error: function() {
-                    console.error('Failed to load currency');
-                }
-            });
+          $.ajax({
+            url: "/api/settings/currency",
+            method: "GET",
+            success: function (data) {
+              currentCurrency = data.currency || "USD";
+              $("#currency-selector").val(currentCurrency);
+              $("#currency-selector-mobile").val(currentCurrency);
+            },
+            error: function () {
+              console.error("Failed to load currency");
+            },
+          });
         }
         function saveCurrency(currency) {
-            showLoading();
-            
-            $.ajax({
-                url: '/api/settings/currency',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ currency: currency }),
-                success: function() {
-                    currentCurrency = currency;
-                    loadDashboardData();
-                    showSuccess('Currency Updated', 'Currency changed to ' + currency);
-                },
-                error: function(xhr) {
-                    const errorMsg = xhr.responseJSON?.error || 'Failed to update currency';
-                    showError('Currency Error', errorMsg);
-                }
-            });
+          showLoading();
+
+          $.ajax({
+            url: "/api/settings/currency",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ currency: currency }),
+            success: function () {
+              currentCurrency = currency;
+              loadDashboardData();
+              showSuccess(
+                "Currency Updated",
+                "Currency changed to " + currency
+              );
+            },
+            error: function (xhr) {
+              const errorMsg =
+                xhr.responseJSON?.error || "Failed to update currency";
+              showError("Currency Error", errorMsg);
+            },
+          });
         }
-        
+
         function formatCurrency(amount) {
-            const symbol = currencySymbols[currentCurrency] || '$';
-            return symbol + amount.toLocaleString();
+          const symbol = currencySymbols[currentCurrency] || "$";
+          return symbol + amount.toLocaleString();
         }
 
         function logout() {
