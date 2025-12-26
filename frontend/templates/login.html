@@ -54,14 +54,60 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
     $('#login-form').submit(function(e) {
         e.preventDefault();
         
+        const email = $('#email').val().trim();
+        const password = $('#password').val();
+        
+        // Validation
+        if (!email) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Email is required',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please enter a valid email address',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        if (!password) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Password is required',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        if (password.length < 6) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Password must be at least 6 characters',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
         const formData = {
-            email: $('#email').val(),
-            password: $('#password').val()
+            email: email,
+            password: password
         };
         
         $.ajax({
@@ -70,11 +116,17 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify(formData),
             success: function(response) {
-                localStorage.setItem('token', response.token);
+                localStorage.setItem('fti_token', response.token);
                 window.location.href = '/';
             },
-            error: function() {
-                alert('Invalid credentials');
+            error: function(xhr) {
+                const errorMsg = xhr.responseJSON?.error || 'Invalid credentials. Please try again.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: errorMsg,
+                    confirmButtonColor: '#0ea5e9'
+                });
             }
         });
     });

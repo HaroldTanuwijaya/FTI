@@ -52,22 +52,92 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
     $('#register-form').submit(function(e) {
         e.preventDefault();
         
+        const name = $('#name').val().trim();
+        const email = $('#email').val().trim();
         const password = $('#password').val();
         const confirmPassword = $('#confirm-password').val();
         
+        // Validation
+        if (!name || name.length < 2) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Name must be at least 2 characters',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        if (name.length > 100) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Name is too long (max 100 characters)',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        if (!email) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Email is required',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please enter a valid email address',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        if (!password || password.length < 6) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Password must be at least 6 characters',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
+        if (password.length > 128) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Password is too long (max 128 characters)',
+                confirmButtonColor: '#0ea5e9'
+            });
+            return;
+        }
+        
         if (password !== confirmPassword) {
-            alert('Passwords do not match');
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Passwords do not match',
+                confirmButtonColor: '#0ea5e9'
+            });
             return;
         }
         
         const formData = {
-            name: $('#name').val(),
-            email: $('#email').val(),
+            name: name,
+            email: email,
             password: password
         };
         
@@ -77,11 +147,25 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify(formData),
             success: function(response) {
-                localStorage.setItem('token', response.token);
-                window.location.href = '/';
+                localStorage.setItem('fti_token', response.token);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registration Successful!',
+                    text: 'Welcome to FTI',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '/';
+                });
             },
-            error: function() {
-                alert('Registration failed');
+            error: function(xhr) {
+                const errorMsg = xhr.responseJSON?.error || 'Registration failed. Please try again.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Failed',
+                    text: errorMsg,
+                    confirmButtonColor: '#0ea5e9'
+                });
             }
         });
     });

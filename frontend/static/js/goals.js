@@ -1,4 +1,24 @@
 $(document).ready(function() {
+    // Check authentication
+    const token = localStorage.getItem('fti_token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    // Setup AJAX defaults with token
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        },
+        error: function(xhr) {
+            if (xhr.status === 401) {
+                localStorage.removeItem('fti_token');
+                window.location.href = '/login';
+            }
+        }
+    });
+    
     loadGoals();
     
     $('#add-goal-btn').click(openGoalModal);
@@ -50,11 +70,18 @@ $(document).ready(function() {
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold text-gray-900">${goal.name}</h3>
-                        <button class="delete-goal text-gray-400 hover:text-red-600" data-id="${goal._id}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
+                        <div class="flex space-x-2">
+                            <button class="update-goal text-fti-blue hover:text-fti-blue-dark" data-id="${goal._id}" title="Update Progress">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            <button class="delete-goal text-gray-400 hover:text-red-600" data-id="${goal._id}" title="Delete Goal">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="mb-4">
@@ -99,6 +126,14 @@ $(document).ready(function() {
             const goalId = $(this).data('id');
             if (confirm('Are you sure you want to delete this goal?')) {
                 deleteGoal(goalId);
+            }
+        });
+        
+        $('.update-goal').click(function() {
+            const goalId = $(this).data('id');
+            const goal = goals.find(g => g._id === goalId);
+            if (goal) {
+                openUpdateModal(goal);
             }
         });
     }
@@ -148,6 +183,66 @@ $(document).ready(function() {
             },
             error: function() {
                 alert('Failed to delete goal');
+            }
+        });
+    }
+    
+    function openUpdateModal(goal) {
+        Swal.fire({
+            title: `Update "${goal.name}"`,
+            html: `
+                <div class="text-left mb-4">
+                    <p class="text-gray-600 mb-2">Current: <span class="font-semibold text-green-600">$${goal.current_amount.toLocaleString()}</span></p>
+                    <p class="text-gray-600 mb-4">Target: <span class="font-semibold text-blue-600">$${goal.target_amount.toLocaleString()}</span></p>
+                </div>
+            `,
+            input: 'number',
+            inputLabel: 'New Current Amount',
+            inputValue: goal.current_amount,
+            inputAttributes: {
+                min: 0,
+                step: 0.01
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Update',
+            confirmButtonColor: '#0ea5e9',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => {
+                if (!value || value < 0) {
+                    return 'Please enter a valid amount'
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                updateGoal(goal._id, parseFloat(result.value));
+            }
+        });
+    }
+    
+    function updateGoal(goalId, newAmount) {
+        $.ajax({
+            url: '/api/goals/' + goalId,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                current_amount: newAmount
+            }),
+            success: function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Updated!',
+                    text: 'Goal progress updated successfully',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                loadGoals();
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to update goal'
+                });
             }
         });
     }

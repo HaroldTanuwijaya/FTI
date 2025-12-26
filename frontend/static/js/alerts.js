@@ -1,4 +1,24 @@
 $(document).ready(function() {
+    // Check authentication
+    const token = localStorage.getItem('fti_token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    // Setup AJAX defaults with token
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        },
+        error: function(xhr) {
+            if (xhr.status === 401) {
+                localStorage.removeItem('fti_token');
+                window.location.href = '/login';
+            }
+        }
+    });
+    
     loadAlerts();
     loadAlertSettings();
     

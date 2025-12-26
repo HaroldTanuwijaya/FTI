@@ -18,7 +18,10 @@ app = Flask(__name__,
 app.secret_key = os.getenv("SECRET_KEY", "your-secret-key-here")
 
 # MongoDB Configuration
+import ssl
 app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/fti_db")
+app.config["MONGO_TLS"] = True
+app.config["MONGO_TLS_INSECURE"] = True  # For development only
 mongo = PyMongo(app)
 
 # Cache Configuration
@@ -136,23 +139,44 @@ def login():
 
 @app.route('/api/dashboard')
 @token_required
-@cache.memoize(timeout=60)  # Cache for 1 minute
 def api_dashboard(current_user_id):
     try:
-        current_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        next_month = (current_month + timedelta(days=32)).replace(day=1)
+        # Get period from query parameter
+        period = request.args.get('period', 'month')
+        
+        # Calculate date range based on period
+        now = datetime.now()
+        if period == 'today':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        elif period == 'week':
+            start_date = now - timedelta(days=now.weekday())
+            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        elif period == 'month':
+            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = (start_date + timedelta(days=32)).replace(day=1)
+        elif period == 'year':
+            start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        else:  # all
+            start_date = datetime(2000, 1, 1)
+            end_date = now
         
         dashboard_data = {
             "fti_score": calculate_fti_score(current_user_id),
-            "monthly_income": get_monthly_income(current_user_id, current_month, next_month),
-            "monthly_expenses": get_monthly_expenses(current_user_id, current_month, next_month),
+            "monthly_income": get_monthly_income(current_user_id, start_date, end_date),
+            "monthly_expenses": get_monthly_expenses(current_user_id, start_date, end_date),
             "net_flow": 0,
-            "budget_used": get_budget_usage(current_user_id, current_month, next_month),
+            "wallet_balance": get_wallet_balance(current_user_id),
+            "budget_used": get_budget_usage(current_user_id, start_date, end_date),
             "recent_transactions": get_recent_transactions(current_user_id),
-            "total_transactions": get_transaction_count(current_user_id, current_month, next_month),
-            "avg_daily_spend": get_avg_daily_spend(current_user_id, current_month, next_month),
-            "top_category": get_top_category(current_user_id, current_month, next_month),
-            "recurring_count": detect_recurring_transactions(current_user_id)
+            "monthly_summary": {
+                "transaction_count": get_transaction_count(current_user_id, start_date, end_date),
+                "daily_average": get_avg_daily_spend(current_user_id, start_date, end_date),
+                "top_category": get_top_category(current_user_id, start_date, end_date),
+                "recurring_count": detect_recurring_transactions(current_user_id)
+            }
         }
         
         dashboard_data["net_flow"] = dashboard_data["monthly_income"] - dashboard_data["monthly_expenses"]
@@ -183,10 +207,6 @@ def add_transaction(current_user_id):
         
         result = mongo.db.transactions.insert_one(transaction_data)
         
-        # Clear cache for this user
-        cache.delete_memoized(api_dashboard, current_user_id)
-        cache.delete_memoized(get_goals, current_user_id)
-        
         # Check for alerts
         check_transaction_alerts(current_user_id, transaction_data)
         
@@ -199,23 +219,28 @@ def add_transaction(current_user_id):
 @token_required
 def set_budget(current_user_id):
     try:
+        from bson import ObjectId
         data = request.get_json()
         
-        # Update or create budget for current month
-        budget_data = Budget.create_budget(
-            current_user_id,
-            data['month'],
-            data['total_amount']
-        )
+        # Get current month if not provided
+        current_month = data.get('month', datetime.now().strftime("%Y-%m"))
         
-        mongo.db.budgets.replace_one(
-            {"user_id": budget_data["user_id"], "month": data['month']},
-            budget_data,
+        # Create budget data
+        budget_data = {
+            "user_id": ObjectId(current_user_id),
+            "month": current_month,
+            "total_amount": float(data['total_amount']),
+            "categories": {},
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Update or insert
+        mongo.db.budgets.update_one(
+            {"user_id": ObjectId(current_user_id), "month": current_month},
+            {"$set": budget_data},
             upsert=True
         )
-        
-        # Clear cache
-        cache.delete_memoized(api_dashboard, current_user_id)
         
         return jsonify({"success": True})
     
@@ -275,9 +300,19 @@ def export_csv():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/reports/monthly')
-@token_required
-def monthly_report(current_user_id):
+def monthly_report():
     try:
+        # Get token from query parameter for file download
+        token = request.args.get('token')
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+        
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=['HS256'])
+            current_user_id = data['user_id']
+        except:
+            return jsonify({'message': 'Token is invalid'}), 401
+        
         # Generate simple monthly report (placeholder for PDF generation)
         current_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         next_month = (current_month + timedelta(days=32)).replace(day=1)
@@ -300,7 +335,6 @@ def monthly_report(current_user_id):
 # Goals API
 @app.route('/api/goals', methods=['GET'])
 @token_required
-@cache.memoize(timeout=120)  # Cache for 2 minutes
 def get_goals(current_user_id):
     try:
         from bson import ObjectId
@@ -314,7 +348,7 @@ def get_goals(current_user_id):
                 "name": goal.get("name", ""),
                 "target_amount": goal.get("target_amount", 0),
                 "current_amount": goal.get("current_amount", 0),
-                "target_date": goal.get("target_date", ""),
+                "deadline": goal.get("deadline", ""),
                 "status": goal.get("status", "active")
             })
         
@@ -327,23 +361,81 @@ def get_goals(current_user_id):
 @token_required
 def create_goal(current_user_id):
     try:
+        from bson import ObjectId
         data = request.get_json()
         
-        goal_data = Goal.create_goal(
-            current_user_id,
-            data['name'],
-            data['target_amount'],
-            data.get('current_amount', 0),
-            data['target_date']
-        )
+        goal_data = {
+            "user_id": ObjectId(current_user_id),
+            "name": data['name'],
+            "target_amount": float(data['target_amount']),
+            "current_amount": float(data.get('current_amount', 0)),
+            "deadline": data['deadline'],
+            "status": "active",
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
         
         mongo.db.goals.insert_one(goal_data)
         
-        # Clear cache
-        cache.delete_memoized(get_goals, current_user_id)
-        cache.delete_memoized(api_dashboard, current_user_id)
-        
         return jsonify({"success": True})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/goals/<goal_id>', methods=['GET'])
+@token_required
+def get_goal(current_user_id, goal_id):
+    try:
+        from bson import ObjectId
+        goal = mongo.db.goals.find_one({
+            "_id": ObjectId(goal_id),
+            "user_id": ObjectId(current_user_id)
+        })
+        
+        if not goal:
+            return jsonify({"error": "Goal not found"}), 404
+        
+        return jsonify({
+            "_id": str(goal["_id"]),
+            "name": goal.get("name", ""),
+            "target_amount": goal.get("target_amount", 0),
+            "current_amount": goal.get("current_amount", 0),
+            "deadline": goal.get("deadline", ""),
+            "status": goal.get("status", "active")
+        })
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/goals/<goal_id>', methods=['PUT'])
+@token_required
+def update_goal(current_user_id, goal_id):
+    try:
+        from bson import ObjectId
+        data = request.get_json()
+        
+        update_data = {
+            "current_amount": float(data.get('current_amount', 0)),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Optionally update other fields if provided
+        if 'name' in data:
+            update_data['name'] = data['name']
+        if 'target_amount' in data:
+            update_data['target_amount'] = float(data['target_amount'])
+        if 'deadline' in data:
+            update_data['deadline'] = data['deadline']
+        
+        result = mongo.db.goals.update_one(
+            {"_id": ObjectId(goal_id), "user_id": ObjectId(current_user_id)},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            return jsonify({"error": "Goal not found"}), 404
+        
+        return jsonify({"message": "Goal updated successfully"})
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -358,11 +450,52 @@ def delete_goal(current_user_id, goal_id):
             "user_id": ObjectId(current_user_id)
         })
         
-        # Clear cache
-        cache.delete_memoized(get_goals, current_user_id)
-        cache.delete_memoized(api_dashboard, current_user_id)
-        
         return jsonify({"success": True})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Spending Trends API
+@app.route('/api/spending-trends')
+@token_required
+def get_spending_trends(current_user_id):
+    try:
+        from bson import ObjectId
+        from collections import defaultdict
+        
+        # Get last 7 days
+        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        seven_days_ago = today - timedelta(days=6)
+        
+        # Get transactions
+        transactions = list(mongo.db.transactions.find({
+            "user_id": ObjectId(current_user_id),
+            "date": {"$gte": seven_days_ago, "$lte": datetime.now()}
+        }))
+        
+        # Aggregate by day
+        daily_data = defaultdict(lambda: {"income": 0, "expense": 0})
+        
+        for t in transactions:
+            date_key = t['date'].strftime('%Y-%m-%d')
+            if t['type'] == 'income':
+                daily_data[date_key]['income'] += t['amount']
+            else:
+                daily_data[date_key]['expense'] += t['amount']
+        
+        # Build 7-day array
+        trends = []
+        for i in range(7):
+            date = seven_days_ago + timedelta(days=i)
+            date_key = date.strftime('%Y-%m-%d')
+            trends.append({
+                "date": date_key,
+                "label": "Today" if i == 6 else date.strftime('%a'),
+                "income": daily_data[date_key]['income'],
+                "expense": daily_data[date_key]['expense']
+            })
+        
+        return jsonify({"trends": trends})
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -380,14 +513,29 @@ def get_alerts(current_user_id):
         formatted_alerts = []
         for alert in alerts:
             formatted_alerts.append({
+                "_id": str(alert.get("_id")),
                 "title": alert.get("title", ""),
                 "message": alert.get("message", ""),
                 "type": alert.get("type", "info"),
+                "read": alert.get("read", False),
                 "created_at": alert.get("created_at", datetime.now()).isoformat()
             })
         
         return jsonify({"alerts": formatted_alerts})
     
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/alerts/mark-read', methods=['POST'])
+@token_required
+def mark_alerts_read(current_user_id):
+    try:
+        from bson import ObjectId
+        mongo.db.alerts.update_many(
+            {"user_id": ObjectId(current_user_id)},
+            {"$set": {"read": True}}
+        )
+        return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -438,6 +586,33 @@ def save_alert_settings(current_user_id):
         
         return jsonify({"success": True})
     
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# User Settings API
+@app.route('/api/settings/currency', methods=['GET'])
+@token_required
+def get_currency(current_user_id):
+    try:
+        from bson import ObjectId
+        user = mongo.db.users.find_one({"_id": ObjectId(current_user_id)})
+        return jsonify({"currency": user.get("currency", "USD")})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/settings/currency', methods=['POST'])
+@token_required
+def set_currency(current_user_id):
+    try:
+        from bson import ObjectId
+        data = request.get_json()
+        
+        mongo.db.users.update_one(
+            {"_id": ObjectId(current_user_id)},
+            {"$set": {"currency": data.get("currency", "USD")}}
+        )
+        
+        return jsonify({"success": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -544,12 +719,33 @@ def get_monthly_expenses(user_id, start_date, end_date):
     except Exception:
         return 0
 
+def get_wallet_balance(user_id):
+    try:
+        from bson import ObjectId
+        # Get all transactions
+        transactions = mongo.db.transactions.find({"user_id": ObjectId(user_id)})
+        
+        total_income = 0
+        total_expenses = 0
+        
+        for t in transactions:
+            if t['type'] == 'income':
+                total_income += t['amount']
+            else:
+                total_expenses += t['amount']
+        
+        return round(total_income - total_expenses, 2)
+    except:
+        return 0
+
 def get_budget_usage(user_id, start_date, end_date):
     try:
         from bson import ObjectId
+        # Always use current month for budget lookup
+        current_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         budget = mongo.db.budgets.find_one({
             "user_id": ObjectId(user_id), 
-            "month": start_date.strftime("%Y-%m")
+            "month": current_month.strftime("%Y-%m")
         })
         
         if not budget:

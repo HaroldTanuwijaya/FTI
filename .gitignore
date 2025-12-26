@@ -41,3 +41,5 @@ PERFORMANCE.md
 runtime.text
 deplo_free.sh
 Procfile
+
+/backend/init_db.py
