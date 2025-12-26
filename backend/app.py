@@ -766,6 +766,16 @@ def create_goal(current_user_id):
         from bson import ObjectId
         data = request.get_json()
         
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        if not data.get('name'):
+            return jsonify({"error": "Name is required"}), 400
+        if not data.get('target_amount'):
+            return jsonify({"error": "Target amount is required"}), 400
+        if not data.get('deadline'):
+            return jsonify({"error": "Deadline is required"}), 400
+        
         goal_data = {
             "user_id": ObjectId(current_user_id),
             "name": data['name'],
@@ -781,6 +791,8 @@ def create_goal(current_user_id):
         
         return jsonify({"success": True})
     
+    except ValueError as e:
+        return jsonify({"error": "Invalid number format"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
