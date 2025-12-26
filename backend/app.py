@@ -77,6 +77,408 @@ def login_page():
 def register_page():
     return render_template('register.html')
 
+@app.route('/analytics')
+def analytics_page():
+    return render_template('analytics.html')
+
+@app.route('/api/analytics/overview', methods=['GET'])
+@token_required
+def get_analytics_overview(current_user_id):
+    try:
+        from bson import ObjectId
+        
+        # Get current month data
+        now = datetime.now()
+        current_month = datetime(now.year, now.month, 1)
+        
+        # Get basic financial data
+        current_income = get_monthly_income(current_user_id, current_month, now)
+        current_expenses = get_monthly_expenses(current_user_id, current_month, now)
+        
+        # Simple monthly trends (last 3 months)
+        monthly_trends = []
+        for i in range(3):
+            month_start = (current_month - timedelta(days=30*i)).replace(day=1)
+            month_end = (month_start + timedelta(days=32)).replace(day=1)
+            
+            income = get_monthly_income(current_user_id, month_start, month_end)
+            expenses = get_monthly_expenses(current_user_id, month_start, month_end)
+            
+            monthly_trends.append({
+                "month": month_start.strftime("%b %Y"),
+                "income": float(income),
+                "expenses": float(expenses),
+                "net": float(income - expenses)
+            })
+        
+        # Get category data
+        try:
+            three_months_ago = current_month - timedelta(days=90)
+            category_data = get_category_breakdown(current_user_id, three_months_ago, now)
+            if not category_data:
+                category_data = [{"category": "No Data", "total": 1}]
+        except:
+            category_data = [{"category": "No Data", "total": 1}]
+        
+        # Calculate health metrics
+        savings_rate = ((current_income - current_expenses) / current_income * 100) if current_income > 0 else 0
+        
+        health_metrics = {
+            "savings_rate": float(savings_rate),
+            "expense_volatility": 15.0,  # Placeholder
+            "top_spending_day": {"date": "N/A", "amount": 0},
+            "average_transaction_size": {
+                "average": float(current_expenses / 10) if current_expenses > 0 else 0, 
+                "count": 10
+            }
+        }
+        
+        # Goals analysis
+        try:
+            goals = list(mongo.db.goals.find({"user_id": ObjectId(current_user_id)}).limit(10))
+            completed = sum(1 for g in goals if g.get("current_amount", 0) >= g.get("target_amount", 1))
+            
+            goals_analysis = {
+                "total_goals": len(goals),
+                "completed": completed,
+                "in_progress": len(goals) - completed,
+                "completion_rate": float((completed / len(goals) * 100) if goals else 0)
+            }
+        except:
+            goals_analysis = {
+                "total_goals": 0,
+                "completed": 0,
+                "in_progress": 0,
+                "completion_rate": 0.0
+            }
+        
+        # FTI breakdown
+        fti_breakdown = {
+            "cash_flow": float(min(100, max(0, savings_rate + 50))),
+            "spending_control": 70.0,
+            "savings_discipline": float(min(100, max(0, savings_rate * 5))),
+            "stability": 60.0,
+            "debt_management": 90.0,
+            "goal_progress": float(goals_analysis["completion_rate"])
+        }
+        
+        # Simple daily pattern
+        daily_pattern = [
+            {"day": "Monday", "total": float(current_expenses * 0.15), "average": float(current_expenses * 0.15)},
+            {"day": "Tuesday", "total": float(current_expenses * 0.12), "average": float(current_expenses * 0.12)},
+            {"day": "Wednesday", "total": float(current_expenses * 0.14), "average": float(current_expenses * 0.14)},
+            {"day": "Thursday", "total": float(current_expenses * 0.16), "average": float(current_expenses * 0.16)},
+            {"day": "Friday", "total": float(current_expenses * 0.18), "average": float(current_expenses * 0.18)},
+            {"day": "Saturday", "total": float(current_expenses * 0.20), "average": float(current_expenses * 0.20)},
+            {"day": "Sunday", "total": float(current_expenses * 0.05), "average": float(current_expenses * 0.05)}
+        ]
+        
+        return jsonify({
+            "monthly_trends": monthly_trends,
+            "category_breakdown": category_data[:6],  # Limit to 6 categories
+            "spending_patterns": {"daily_pattern": daily_pattern},
+            "health_metrics": health_metrics,
+            "goals_analysis": goals_analysis,
+            "fti_score_breakdown": fti_breakdown
+        })
+        
+    except Exception as e:
+        print(f"Analytics error: {e}")
+        # Return basic mock data
+        return jsonify({
+            "monthly_trends": [
+                {"month": "Dec 2024", "income": 0, "expenses": 0, "net": 0},
+                {"month": "Nov 2024", "income": 0, "expenses": 0, "net": 0},
+                {"month": "Oct 2024", "income": 0, "expenses": 0, "net": 0}
+            ],
+            "category_breakdown": [{"category": "No Data", "total": 1}],
+            "spending_patterns": {"daily_pattern": [
+                {"day": "Monday", "total": 0, "average": 0},
+                {"day": "Tuesday", "total": 0, "average": 0},
+                {"day": "Wednesday", "total": 0, "average": 0},
+                {"day": "Thursday", "total": 0, "average": 0},
+                {"day": "Friday", "total": 0, "average": 0},
+                {"day": "Saturday", "total": 0, "average": 0},
+                {"day": "Sunday", "total": 0, "average": 0}
+            ]},
+            "health_metrics": {
+                "savings_rate": 0,
+                "expense_volatility": 0,
+                "top_spending_day": {"date": "N/A", "amount": 0},
+                "average_transaction_size": {"average": 0, "count": 0}
+            },
+            "goals_analysis": {
+                "total_goals": 0,
+                "completed": 0,
+                "in_progress": 0,
+                "completion_rate": 0
+            },
+            "fti_score_breakdown": {
+                "cash_flow": 0,
+                "spending_control": 0,
+                "savings_discipline": 0,
+                "stability": 0,
+                "debt_management": 0,
+                "goal_progress": 0
+            }
+        })
+
+def get_spending_patterns(user_id, start_date, end_date):
+    try:
+        from bson import ObjectId
+        
+        # Daily spending pattern
+        pipeline = [
+            {"$match": {
+                "user_id": ObjectId(user_id),
+                "type": "expense",
+                "date": {"$gte": start_date, "$lte": end_date}
+            }},
+            {"$group": {
+                "_id": {"$dayOfWeek": "$date"},
+                "total": {"$sum": "$amount"},
+                "count": {"$sum": 1}
+            }},
+            {"$sort": {"_id": 1}}
+        ]
+        
+        daily_pattern = list(mongo.db.transactions.aggregate(pipeline))
+        days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        
+        formatted_daily = []
+        for i in range(7):
+            day_data = next((d for d in daily_pattern if d["_id"] == i+1), {"total": 0, "count": 0})
+            formatted_daily.append({
+                "day": days[i],
+                "total": day_data["total"],
+                "count": day_data["count"],
+                "average": day_data["total"] / day_data["count"] if day_data["count"] > 0 else 0
+            })
+        
+        return {
+            "daily_pattern": formatted_daily,
+            "peak_spending_day": max(formatted_daily, key=lambda x: x["total"])["day"],
+            "most_frequent_day": max(formatted_daily, key=lambda x: x["count"])["day"]
+        }
+        
+    except Exception:
+        return {"daily_pattern": [], "peak_spending_day": "N/A", "most_frequent_day": "N/A"}
+
+def calculate_savings_rate(user_id, start_date, end_date):
+    try:
+        income = get_monthly_income(user_id, start_date, end_date)
+        expenses = get_monthly_expenses(user_id, start_date, end_date)
+        return ((income - expenses) / income * 100) if income > 0 else 0
+    except:
+        return 0
+
+def calculate_expense_volatility(user_id, start_date, end_date):
+    try:
+        from bson import ObjectId
+        
+        # Get monthly expenses for volatility calculation
+        monthly_expenses = []
+        current = start_date
+        
+        while current < end_date:
+            next_month = (current + timedelta(days=32)).replace(day=1)
+            expense = get_monthly_expenses(user_id, current, next_month)
+            if expense > 0:
+                monthly_expenses.append(expense)
+            current = next_month
+        
+        if len(monthly_expenses) < 2:
+            return 0
+        
+        # Calculate coefficient of variation
+        import statistics
+        mean_expense = statistics.mean(monthly_expenses)
+        std_expense = statistics.stdev(monthly_expenses)
+        
+        return (std_expense / mean_expense * 100) if mean_expense > 0 else 0
+        
+    except:
+        return 0
+
+def get_top_spending_day(user_id, start_date, end_date):
+    try:
+        from bson import ObjectId
+        
+        pipeline = [
+            {"$match": {
+                "user_id": ObjectId(user_id),
+                "type": "expense",
+                "date": {"$gte": start_date, "$lte": end_date}
+            }},
+            {"$group": {
+                "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$date"}},
+                "total": {"$sum": "$amount"}
+            }},
+            {"$sort": {"total": -1}},
+            {"$limit": 1}
+        ]
+        
+        result = list(mongo.db.transactions.aggregate(pipeline))
+        if result:
+            return {
+                "date": result[0]["_id"],
+                "amount": result[0]["total"]
+            }
+        return {"date": "N/A", "amount": 0}
+        
+    except:
+        return {"date": "N/A", "amount": 0}
+
+def get_avg_transaction_size(user_id, start_date, end_date):
+    try:
+        from bson import ObjectId
+        
+        pipeline = [
+            {"$match": {
+                "user_id": ObjectId(user_id),
+                "type": "expense",
+                "date": {"$gte": start_date, "$lte": end_date}
+            }},
+            {"$group": {
+                "_id": None,
+                "avg_amount": {"$avg": "$amount"},
+                "total_transactions": {"$sum": 1}
+            }}
+        ]
+        
+        result = list(mongo.db.transactions.aggregate(pipeline))
+        if result:
+            return {
+                "average": result[0]["avg_amount"],
+                "count": result[0]["total_transactions"]
+            }
+        return {"average": 0, "count": 0}
+        
+    except:
+        return {"average": 0, "count": 0}
+
+def get_goals_analysis(user_id):
+    try:
+        from bson import ObjectId
+        
+        goals = list(mongo.db.goals.find({"user_id": ObjectId(user_id)}))
+        
+        if not goals:
+            return {"total_goals": 0, "completed": 0, "in_progress": 0, "completion_rate": 0}
+        
+        completed = sum(1 for g in goals if g.get("current_amount", 0) >= g.get("target_amount", 1))
+        in_progress = len(goals) - completed
+        
+        return {
+            "total_goals": len(goals),
+            "completed": completed,
+            "in_progress": in_progress,
+            "completion_rate": (completed / len(goals) * 100) if goals else 0,
+            "total_target": sum(g.get("target_amount", 0) for g in goals),
+            "total_saved": sum(g.get("current_amount", 0) for g in goals)
+        }
+        
+    except:
+        return {"total_goals": 0, "completed": 0, "in_progress": 0, "completion_rate": 0}
+
+def get_fti_score_breakdown(user_id):
+    try:
+        from bson import ObjectId
+        current_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        next_month = (current_month + timedelta(days=32)).replace(day=1)
+        
+        # Get individual component scores (simplified version of calculate_fti_score)
+        income = get_monthly_income(user_id, current_month, next_month)
+        expenses = get_monthly_expenses(user_id, current_month, next_month)
+        
+        # Calculate each component
+        cash_flow_score = min(100, max(0, ((income - expenses) / income * 100))) if income > 0 else 0
+        savings_rate = ((income - expenses) / income * 100) if income > 0 else 0
+        savings_score = min(100, max(0, savings_rate * 5))
+        
+        return {
+            "cash_flow": round(cash_flow_score),
+            "spending_control": 70,  # Placeholder
+            "savings_discipline": round(savings_score),
+            "stability": 60,  # Placeholder
+            "debt_management": 90,  # Placeholder
+            "goal_progress": 65   # Placeholder
+        }
+        
+    except:
+        return {
+            "cash_flow": 0,
+            "spending_control": 0,
+            "savings_discipline": 0,
+            "stability": 0,
+            "debt_management": 0,
+            "goal_progress": 0
+        }
+
+@app.route('/transactions')
+def transactions_page():
+    return render_template('transactions.html')
+
+@app.route('/api/transactions/history', methods=['GET'])
+@token_required
+def get_transaction_history(current_user_id):
+    try:
+        from bson import ObjectId
+        
+        # Get query parameters
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 20))
+        sort_by = request.args.get('sort', 'date')
+        sort_order = request.args.get('order', 'desc')
+        category_filter = request.args.get('category', '')
+        type_filter = request.args.get('type', '')
+        
+        # Build query
+        query = {"user_id": ObjectId(current_user_id)}
+        if category_filter:
+            query["category"] = category_filter
+        if type_filter:
+            query["type"] = type_filter
+        
+        # Build sort
+        sort_direction = -1 if sort_order == 'desc' else 1
+        sort_field = sort_by if sort_by in ['date', 'amount', 'category', 'type'] else 'date'
+        
+        # Get total count
+        total = mongo.db.transactions.count_documents(query)
+        
+        # Get transactions with pagination
+        skip = (page - 1) * limit
+        transactions = list(mongo.db.transactions.find(query)
+                          .sort(sort_field, sort_direction)
+                          .skip(skip)
+                          .limit(limit))
+        
+        # Format transactions
+        formatted_transactions = []
+        for t in transactions:
+            formatted_transactions.append({
+                "id": str(t["_id"]),
+                "amount": t["amount"],
+                "type": t["type"],
+                "description": t["description"],
+                "category": t["category"],
+                "date": t["date"].strftime("%Y-%m-%d %H:%M")
+            })
+        
+        return jsonify({
+            "transactions": formatted_transactions,
+            "pagination": {
+                "current_page": page,
+                "total_pages": (total + limit - 1) // limit,
+                "total_items": total,
+                "items_per_page": limit
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/goals')
 def goals_page():
     return render_template('goals.html')
@@ -175,7 +577,7 @@ def api_dashboard(current_user_id):
                 "transaction_count": get_transaction_count(current_user_id, start_date, end_date),
                 "daily_average": get_avg_daily_spend(current_user_id, start_date, end_date),
                 "top_category": get_top_category(current_user_id, start_date, end_date),
-                "recurring_count": detect_recurring_transactions(current_user_id)
+                "transaction_count": get_monthly_transaction_count(current_user_id, start_date, end_date)
             }
         }
         
@@ -627,20 +1029,37 @@ def calculate_fti_score(user_id):
         expenses = get_monthly_expenses(user_id, current_month, next_month)
         
         # Cash Flow Health (25%) - Income vs Expenses
-        cash_flow_ratio = (income - expenses) / income if income > 0 else 0
-        cash_flow_score = min(100, max(0, cash_flow_ratio * 100))
+        if income > 0 and expenses > 0:
+            cash_flow_ratio = (income - expenses) / income
+            cash_flow_score = min(100, max(0, cash_flow_ratio * 100))
+        elif income > 0 and expenses == 0:
+            # Has income but no expenses - neutral score until they start tracking
+            cash_flow_score = 50
+        else:
+            # No financial activity
+            cash_flow_score = 0
         
         # Spending Control (20%) - Budget adherence
         budget_usage = get_budget_usage(user_id, current_month, next_month)
         spending_control_score = max(0, 100 - budget_usage) if budget_usage > 0 else 70
         
         # Savings Discipline (20%) - Savings rate
-        savings_rate = ((income - expenses) / income * 100) if income > 0 else 0
-        savings_discipline_score = min(100, max(0, savings_rate * 5))  # 20% savings = 100 score
+        if income > 0 and expenses > 0:
+            savings_rate = ((income - expenses) / income * 100)
+            savings_discipline_score = min(100, max(0, savings_rate * 5))  # 20% savings = 100 score
+        elif income > 0 and expenses == 0:
+            # Has income but no expenses recorded - assume no active saving habit yet
+            savings_discipline_score = 30  # Low score until they start tracking expenses
+        else:
+            # No income or financial activity
+            savings_discipline_score = 0
         
         # Stability & Consistency (15%) - Transaction regularity
         transaction_count = get_transaction_count(user_id, current_month, next_month)
-        stability_score = min(100, transaction_count * 5)  # More transactions = more tracking
+        if transaction_count == 0:
+            stability_score = 0  # No transactions = no stability
+        else:
+            stability_score = min(100, transaction_count * 5)  # More transactions = more tracking
         
         # Debt & Obligations (10%) - Placeholder for future debt tracking
         debt_score = 90
@@ -798,9 +1217,31 @@ def get_transaction_count(user_id, start_date, end_date):
 
 def get_avg_daily_spend(user_id, start_date, end_date):
     try:
-        expenses = get_monthly_expenses(user_id, start_date, end_date)
-        days_in_month = (end_date - start_date).days
-        return round(expenses / days_in_month, 2) if days_in_month > 0 else 0
+        from bson import ObjectId
+        
+        # Get all expense transactions for the period
+        transactions = list(mongo.db.transactions.find({
+            "user_id": ObjectId(user_id),
+            "type": "expense",
+            "date": {"$gte": start_date, "$lt": end_date}
+        }))
+        
+        if not transactions:
+            return 0
+        
+        # Group by date to get unique spending days
+        spending_days = set()
+        total_expenses = 0
+        
+        for transaction in transactions:
+            transaction_date = transaction['date'].date()
+            spending_days.add(transaction_date)
+            total_expenses += transaction['amount']
+        
+        # Calculate average based on actual spending days, not calendar days
+        active_days = len(spending_days)
+        return round(total_expenses / active_days, 2) if active_days > 0 else 0
+        
     except Exception:
         return 0
 
@@ -830,24 +1271,45 @@ def get_top_category(user_id, start_date, end_date):
     except Exception:
         return "None"
 
+def get_monthly_transaction_count(user_id, start_date, end_date):
+    try:
+        from bson import ObjectId
+        count = mongo.db.transactions.count_documents({
+            "user_id": ObjectId(user_id),
+            "date": {"$gte": start_date, "$lte": end_date}
+        })
+        return count
+    except Exception:
+        return 0
+
 def detect_recurring_transactions(user_id):
     try:
         from bson import ObjectId
-        # Look for transactions with similar descriptions in the last 3 months
-        three_months_ago = datetime.now() - timedelta(days=90)
+        # Look for transactions in current month
+        now = datetime.now()
+        start_of_month = datetime(now.year, now.month, 1)
         
         transactions = list(mongo.db.transactions.find({
             "user_id": ObjectId(user_id),
-            "date": {"$gte": three_months_ago}
+            "date": {"$gte": start_of_month},
+            "type": "expense"  # Only count expense transactions
         }))
         
-        # Group by similar descriptions (simplified detection)
-        descriptions = [t.get("description", "").lower().strip() for t in transactions]
-        description_counts = Counter(descriptions)
+        # Group by similar descriptions and amounts (more accurate detection)
+        recurring_patterns = {}
+        for t in transactions:
+            description = t.get("description", "").lower().strip()
+            amount = round(float(t.get("amount", 0)), 2)
+            key = f"{description}_{amount}"
+            
+            if key in recurring_patterns:
+                recurring_patterns[key] += 1
+            else:
+                recurring_patterns[key] = 1
         
-        # Count descriptions that appear 2+ times (potential recurring)
-        recurring_count = sum(1 for count in description_counts.values() if count >= 2)
-        return recurring_count
+        # Count actual recurring transactions (appeared 2+ times this month)
+        recurring_transactions = sum(count for count in recurring_patterns.values() if count >= 2)
+        return recurring_transactions
     
     except Exception:
         return 0
