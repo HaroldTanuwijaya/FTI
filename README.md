@@ -1,5 +1,9 @@
 # FTI - Financial Tracking Intelligence
 
+
+<img width="1631" height="907" alt="Screenshot 2026-02-27 11 23 57" src="https://github.com/user-attachments/assets/49efd062-40c4-40b2-a741-6f00df14f2d5" />
+
+
 A professional finance tracking application that transforms financial data into actionable intelligence through the FTI Score system.
 
 ## 🌟 Features
@@ -43,26 +47,6 @@ python backend/app.py
 ```
 
 Visit: http://localhost:5000
-
-### Free Deployment
-
-```bash
-# Run deployment setup
-./deploy_free.sh
-```
-
-See [DEPLOYMENT_FREE.md](DEPLOYMENT_FREE.md) for detailed instructions.
-
-## 🆓 Free Hosting Options
-
-| Platform | Free Tier | Best For |
-|----------|-----------|----------|
-| **Render.com** | 750 hrs/month | Easiest setup |
-| **Railway.app** | $5 credit/month | Best performance |
-| **Fly.io** | 3 VMs free | Most flexible |
-| **PythonAnywhere** | Always-on | Simplest |
-
-**Database:** MongoDB Atlas (512MB free)
 
 ## 📊 Tech Stack
 
@@ -144,19 +128,9 @@ Fully responsive design optimized for:
 - Input validation
 - HTTPS ready
 
-## 📚 Documentation
-
-- [Free Deployment Guide](DEPLOYMENT_FREE.md)
-- [Performance Optimization](PERFORMANCE.md)
-- [Project Overview](overview.md)
-
 ## 🤝 Contributing
 
 This is a private project. For questions or issues, contact the project leader.
-
-## 📄 License
-
-Proprietary - All rights reserved
 
 ## 🎉 Deployment Status
 
